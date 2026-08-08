@@ -99,28 +99,28 @@
             position: relative;
             background: rgba(255, 255, 255, 0.08);
             
-            /* 1. 关联纯 SVG 折射滤镜 + 降级兼容高斯模糊与高饱和度 */
+            /* SVG 折射滤镜 + 高斯模糊降级 */
             backdrop-filter: url("#liquid-glass-filter") blur(4px) saturate(190%) contrast(105%);
             -webkit-backdrop-filter: blur(12px) saturate(190%) contrast(105%);
             
-            /* 2. 精细双层立体切面边框 */
+            /* 双层立体切面边框 */
             border: 1px solid rgba(255, 255, 255, 0.65);
             
-            /* 3. 凸透镜边缘光感（顶光、底影、左右光谱色散） */
+            /* 凸透镜边缘光感 */
             box-shadow: 
-                inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95),        /* 顶部高光切面 */
-                inset 0 -2px 4px 0 rgba(0, 0, 0, 0.3),               /* 底部影深 */
-                inset 2.5px 0 6px 0 rgba(255, 255, 255, 0.45),        /* 左边缘折射 */
-                inset -2.5px 0 6px 0 rgba(0, 162, 255, 0.4),         /* 右边缘蓝散 */
-                0 16px 40px rgba(0, 0, 0, 0.35);                     /* 外部浮空阴影 */
+                inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95),
+                inset 0 -2px 4px 0 rgba(0, 0, 0, 0.3),
+                inset 2.5px 0 6px 0 rgba(255, 255, 255, 0.45),
+                inset -2.5px 0 6px 0 rgba(0, 162, 255, 0.4),
+                0 16px 40px rgba(0, 0, 0, 0.35);
             
-            /* 4. 液态弹性形变动画 */
             transition: width 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
                         height 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
                         border-radius 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
                         padding 0.35s ease,
                         background 0.35s ease,
-                        box-shadow 0.35s ease;
+                        box-shadow 0.35s ease,
+                        transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         /* 动态表面高光追踪 */
@@ -140,86 +140,46 @@
             z-index: 1;
         }
 
-        /* ================= 左上角 Logo 菜单 ================= */
-        .top-header {
+        /* ================= 左上角 纯净 Logo 徽标（点击回到首页） ================= */
+        .logo-badge {
             position: fixed;
             top: 20px;
             left: 20px;
             z-index: 200;
-        }
-
-        .logo-menu {
-            width: 120px;
             height: 42px;
+            padding: 0 20px;
             border-radius: 25px;
-            padding: 0 16px;
-            overflow: hidden;
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
             cursor: pointer;
         }
 
-        .logo-menu:hover, .logo-menu.active {
-            width: 280px;
-            height: auto;
-            max-height: 80vh;
-            border-radius: var(--miui-radius-lg);
-            padding: 16px 16px 20px 16px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, var(--glass-tint-blue) 100%);
+        .logo-badge:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.16);
             border-color: rgba(255, 255, 255, 0.85);
             box-shadow: 
                 inset 0 2px 2px 0 rgba(255, 255, 255, 1),
-                inset 0 -3px 6px 0 rgba(0, 0, 0, 0.35),
-                inset 4px 0 8px 0 rgba(255, 255, 255, 0.5),
-                inset -4px 0 8px 0 rgba(0, 162, 255, 0.45),
-                0 24px 48px rgba(0, 0, 0, 0.45);
+                0 12px 28px rgba(0, 0, 0, 0.3);
         }
 
-        .logo-handle {
-            height: 42px;
-            min-height: 42px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: relative;
-            z-index: 2;
+        .logo-badge:active {
+            transform: scale(0.95);
         }
 
-        .logo-handle .logo-title {
+        .logo-badge .logo-title {
             font-size: 1.05rem;
             font-weight: 700;
             color: #ffffff;
             letter-spacing: 0.5px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
-
-        .logo-handle .logo-arrow {
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.9);
-            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .logo-menu:hover .logo-arrow, .logo-menu.active .logo-arrow {
-            transform: rotate(180deg);
-        }
-
-        .logo-content {
-            opacity: 0;
-            transform: translateY(-8px) scale(0.98);
-            transition: opacity 0.35s ease 0.08s, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.08s;
-            pointer-events: none;
-            margin-top: 10px;
             position: relative;
             z-index: 2;
         }
 
-        .logo-menu:hover .logo-content, .logo-menu.active .logo-content {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            pointer-events: auto;
-        }
-
-        /* ================= 右上角 Liquid Glass 侧边栏 ================= */
+        /* ================= 右上角 全功能侧边栏 ================= */
         .sidebar {
             position: fixed;
             top: 20px;
@@ -236,10 +196,10 @@
             cursor: pointer;
         }
 
-        .sidebar:hover {
+        .sidebar:hover, .sidebar.active {
             width: 290px;
             height: auto;
-            max-height: 80vh;
+            max-height: 85vh;
             border-radius: var(--miui-radius-lg);
             padding: 18px 18px 22px 18px;
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, var(--glass-tint-blue) 100%);
@@ -290,7 +250,7 @@
             z-index: 2;
         }
 
-        .sidebar:hover .sidebar-content {
+        .sidebar:hover .sidebar-content, .sidebar.active .sidebar-content {
             opacity: 1;
             transform: translateY(0) scale(1);
             pointer-events: auto;
@@ -302,7 +262,7 @@
             gap: 10px;
         }
 
-        /* ================= 融合玻璃子按键 ================= */
+        /* ================= 预见式玻璃子按键 ================= */
         .glass-item {
             position: relative;
             background: rgba(255, 255, 255, 0.08);
@@ -371,6 +331,7 @@
             transform: translateY(-1px);
         }
 
+        /* 按压预见式高亮态 */
         .glass-item.holding {
             transform: scale(1.02);
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.28) 0%, var(--glass-tint-active) 100%);
@@ -381,81 +342,111 @@
             z-index: 10;
         }
 
-        .glass-item.holding .btn-preview {
+        .sidebar .glass-item.holding .btn-preview {
             max-height: 80px;
             opacity: 1;
             margin-top: 8px;
         }
-    
-/* ===== Mobile collision fix + liquid glass bottom navigation ===== */
-@media (max-width: 600px) {
-    .top-header {
-        left: 12px;
-        right: 12px;
-    }
 
-    .logo-menu.active,
-    .logo-menu:hover {
-        width: calc(100vw - 24px);
-        max-width: none;
-        margin-top: 0;
-    }
+        /* ================= 底部 Liquid Glass 导航栏及预见式预览气泡 ================= */
+        .bottom-nav {
+            position: fixed;
+            left: 50%;
+            bottom: 18px;
+            transform: translateX(-50%) translateY(140%);
+            width: min(92vw, 540px);
+            z-index: 300;
+            padding: 10px;
+            border-radius: 32px;
+            display: flex;
+            gap: 8px;
+            justify-content: space-around;
+            opacity: 0;
+            transition: .45s cubic-bezier(.16,1,.3,1);
+        }
 
-    .sidebar:hover {
-        width: calc(100vw - 24px);
-        max-width: none;
-    }
+        .bottom-nav.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
 
-    .sidebar {
-        right: 12px;
-    }
-}
+        .bottom-nav .glass-item {
+            flex: 1;
+            padding: 11px 6px;
+            text-align: center;
+            overflow: visible; /* 允许气泡溢出显示 */
+        }
 
-.bottom-nav {
-    position: fixed;
-    left: 50%;
-    bottom: 18px;
-    transform: translateX(-50%) translateY(140%);
-    width: min(92vw, 520px);
-    z-index: 300;
-    padding: 12px;
-    border-radius: 32px;
-    display: flex;
-    gap: 8px;
-    justify-content: space-around;
-    opacity: 0;
-    transition: .45s cubic-bezier(.16,1,.3,1);
-}
+        .bottom-nav .glass-item .btn-title {
+            justify-content: center;
+            font-size: 0.88rem;
+        }
 
-.bottom-nav.show {
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-}
+        /* 底部导航预见式悬浮预览气泡 (Tooltip) */
+        .bottom-nav .btn-preview-tooltip {
+            position: absolute;
+            bottom: calc(100% + 14px);
+            left: 50%;
+            transform: translateX(-50%) translateY(8px) scale(0.9);
+            opacity: 0;
+            pointer-events: none;
+            white-space: nowrap;
+            padding: 8px 14px;
+            border-radius: 14px;
+            background: rgba(10, 15, 30, 0.82);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            color: #ffffff;
+            font-size: 0.8rem;
+            font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 50;
+        }
 
-.bottom-nav .glass-item {
-    flex: 1;
-    padding: 10px 8px;
-    text-align: center;
-}
+        .bottom-nav .btn-preview-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px;
+            border-style: solid;
+            border-color: rgba(10, 15, 30, 0.82) transparent transparent transparent;
+        }
 
-.bottom-nav .btn-preview {
-    display: none;
-}
+        .bottom-nav .glass-item.holding .btn-preview-tooltip {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
 
-@media(max-width:600px){
-    .bottom-nav {
-        bottom: 12px;
-        width: calc(100vw - 24px);
-        gap: 5px;
-    }
+        /* ===== 移动端适配 ===== */
+        @media (max-width: 600px) {
+            .logo-badge {
+                left: 12px;
+            }
 
-    .bottom-nav .btn-title {
-        font-size: .75rem;
-        justify-content: center;
-    }
-}
+            .sidebar {
+                right: 12px;
+            }
 
-</style>
+            .sidebar:hover, .sidebar.active {
+                width: calc(100vw - 24px);
+                max-width: none;
+            }
+
+            .bottom-nav {
+                bottom: 12px;
+                width: calc(100vw - 24px);
+                gap: 5px;
+            }
+
+            .bottom-nav .glass-item .btn-title {
+                font-size: 0.78rem;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -470,29 +461,11 @@
         </defs>
     </svg>
 
-    <header class="top-header">
-        <div class="logo-menu glass-container" id="logoMenu">
-            <div class="logo-handle">
-                <span class="logo-title">Sturgeon</span>
-                <span class="logo-arrow">▾</span>
-            </div>
-            <div class="logo-content">
-                <div class="menu-list">
-                    <div class="glass-item predictive-btn" data-href="changelog.html">
-                        <div class="btn-title">📝 开发日志 <span>→</span></div>
-                        <div class="btn-preview">查看网站的版本迭代记录、功能更新与修补日志。</div>
-                    </div>
+    <a class="logo-badge glass-container" id="logoBadge" href="index.html">
+        <span class="logo-title">Sturgeon</span>
+    </a>
 
-                    <div class="glass-item predictive-btn" data-href="https://github.com/your-username/my-personal-website" data-external="true">
-                        <div class="btn-title">💻 网站源代码 <span>→</span></div>
-                        <div class="btn-preview">前往 GitHub 查看项目开源仓库、代码结构与资源。</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <aside class="sidebar glass-container">
+    <aside class="sidebar glass-container" id="sidebar">
         <div class="sidebar-handle">
             <span class="handle-title">⚡ 菜单</span>
             <span class="handle-dot"></span>
@@ -514,15 +487,25 @@
                     <div class="btn-title">🎬 观影记录 <span>→</span></div>
                     <div class="btn-preview">记录我看过的影视作品，包含评分与个人独家短评。</div>
                 </div>
+
+                <div class="glass-item predictive-btn" data-href="changelog.html">
+                    <div class="btn-title">📝 开发日志 <span>→</span></div>
+                    <div class="btn-preview">查看网站的版本迭代记录、功能更新与修补日志。</div>
+                </div>
+
+                <div class="glass-item predictive-btn" data-href="https://github.com/your-username/my-personal-website" data-external="true">
+                    <div class="btn-title">💻 网站源代码 <span>→</span></div>
+                    <div class="btn-preview">前往 GitHub 查看项目开源仓库、代码结构与资源。</div>
+                </div>
             </div>
         </div>
     </aside>
 
-    <main class="scroll-container">
+    <main class="scroll-container" id="scrollContainer">
         <section class="page page-1">
             <div class="hero-title">
                 <h1>这是 Sturgeon 的网站主页</h1>
-                <p>向下滑动探索更多功能 | 点击两侧导航展开菜单</p>
+                <p>向下滑动探索更多功能 | 点击右上角展开全局菜单</p>
             </div>
         </section>
 
@@ -541,6 +524,28 @@
         </section>
     </main>
 
+    <nav class="bottom-nav glass-container" id="bottomNav">
+        <div class="glass-item predictive-btn" data-href="mbti.html">
+            <div class="btn-title">🧠 HATS</div>
+            <div class="btn-preview-tooltip">按住预见：前往 HATS 测试</div>
+        </div>
+
+        <div class="glass-item predictive-btn" data-href="f1.html">
+            <div class="btn-title">🏎 F1</div>
+            <div class="btn-preview-tooltip">按住预见：查阅 F1 赛历</div>
+        </div>
+
+        <div class="glass-item predictive-btn" data-href="movies.html">
+            <div class="btn-title">🎬 观影</div>
+            <div class="btn-preview-tooltip">按住预见：浏览观影记录</div>
+        </div>
+
+        <div class="glass-item predictive-btn" data-href="changelog.html">
+            <div class="btn-title">📝 日志</div>
+            <div class="btn-preview-tooltip">按住预见：查看开发日志</div>
+        </div>
+    </nav>
+
     <script>
         // 1. 动态物理光斑追踪
         document.addEventListener('mousemove', (e) => {
@@ -554,22 +559,31 @@
             });
         });
 
-        // 2. 左上角 Logo 菜单展开控制
-        const logoMenu = document.getElementById('logoMenu');
-        const logoHandle = logoMenu.querySelector('.logo-handle');
-
-        logoHandle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            logoMenu.classList.toggle('active');
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!logoMenu.contains(e.target)) {
-                logoMenu.classList.remove('active');
+        // 2. 左上角 Logo 标点击平滑返回顶部
+        const logoBadge = document.getElementById('logoBadge');
+        const scrollContainer = document.getElementById('scrollContainer');
+        logoBadge?.addEventListener('click', (e) => {
+            if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
+                e.preventDefault();
+                scrollContainer?.scrollTo({ top: 0, behavior: 'smooth' });
             }
         });
 
-        // 3. 按压高亮与预测跳转逻辑
+        // 3. 右上角侧边栏展开控制
+        const sidebar = document.getElementById('sidebar');
+        const sidebarHandle = sidebar?.querySelector('.sidebar-handle');
+        sidebarHandle?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            sidebar.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (sidebar && !sidebar.contains(e.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // 4. 全局预见式长按按压与跳转逻辑（同时应用至右侧菜单与底部导航）
         document.querySelectorAll('.predictive-btn').forEach(btn => {
             let isHolding = false;
 
@@ -585,137 +599,46 @@
                 }
             };
 
-            btn.addEventListener('mousedown', () => {
+            const startHold = () => {
                 isHolding = true;
                 btn.classList.add('holding');
-            });
+            };
 
-            btn.addEventListener('mouseup', () => {
+            const endHoldAndNavigate = () => {
                 if (isHolding) {
                     isHolding = false;
                     btn.classList.remove('holding');
                     executeNavigation();
                 }
-            });
+            };
 
-            btn.addEventListener('mouseleave', () => {
+            const cancelHold = () => {
                 if (isHolding) {
                     isHolding = false;
                     btn.classList.remove('holding');
                 }
-            });
+            };
 
-            btn.addEventListener('touchstart', () => {
-                isHolding = true;
-                btn.classList.add('holding');
-            });
+            btn.addEventListener('mousedown', startHold);
+            btn.addEventListener('mouseup', endHoldAndNavigate);
+            btn.addEventListener('mouseleave', cancelHold);
 
-            btn.addEventListener('touchend', () => {
-                if (isHolding) {
-                    isHolding = false;
-                    btn.classList.remove('holding');
-                    executeNavigation();
-                }
-            });
-
-            btn.addEventListener('touchcancel', () => {
-                if (isHolding) {
-                    isHolding = false;
-                    btn.classList.remove('holding');
-                }
-            });
+            btn.addEventListener('touchstart', startHold);
+            btn.addEventListener('touchend', endHoldAndNavigate);
+            btn.addEventListener('touchcancel', cancelHold);
         });
+
+        // 5. 滑动触发底栏显示
+        if (scrollContainer) {
+            const bottomNav = document.getElementById('bottomNav');
+            scrollContainer.addEventListener('scroll', () => {
+                if (scrollContainer.scrollTop > window.innerHeight * 0.4) {
+                    bottomNav?.classList.add('show');
+                } else {
+                    bottomNav?.classList.remove('show');
+                }
+            });
+        }
     </script>
-
-    <!-- Liquid Glass Bottom Navigation -->
-    <nav class="bottom-nav glass-container" id="bottomNav">
-        <div class="glass-item predictive-btn" data-href="mbti.html">
-            <div class="btn-title">🧠 HATS</div>
-        </div>
-        <div class="glass-item predictive-btn" data-href="f1.html">
-            <div class="btn-title">🏎 F1</div>
-        </div>
-        <div class="glass-item predictive-btn" data-href="movies.html">
-            <div class="btn-title">🎬 观影</div>
-        </div>
-        <div class="glass-item predictive-btn" data-href="changelog.html">
-            <div class="btn-title">📝 日志</div>
-        </div>
-    </nav>
-
-
-<script>
-const bottomNav=document.getElementById('bottomNav');
-const scrollBox=document.querySelector('.scroll-container');
-
-if(scrollBox){
-    scrollBox.addEventListener('scroll',()=>{
-        if(scrollBox.scrollTop>window.innerHeight*0.4){
-            bottomNav.classList.add('show');
-        }else{
-            bottomNav.classList.remove('show');
-        }
-    });
-}
-
-document.querySelector('.sidebar-handle')?.addEventListener('click',function(){
-    document.querySelector('.sidebar')?.classList.toggle('active');
-});
-
-// 底部导航复用右上角菜单跳转逻辑
-document.querySelectorAll('.bottom-nav .predictive-btn').forEach(btn=>{
-    let holding=false;
-
-    const navigate=()=>{
-        const url=btn.getAttribute('data-href');
-        const external=btn.getAttribute('data-external')==='true';
-
-        if(url){
-            if(external){
-                window.open(url,'_blank');
-            }else{
-                window.location.href=url;
-            }
-        }
-    };
-
-    btn.addEventListener('mousedown',()=>{
-        holding=true;
-        btn.classList.add('holding');
-    });
-
-    btn.addEventListener('mouseup',()=>{
-        if(holding){
-            holding=false;
-            btn.classList.remove('holding');
-            navigate();
-        }
-    });
-
-    btn.addEventListener('mouseleave',()=>{
-        holding=false;
-        btn.classList.remove('holding');
-    });
-
-    btn.addEventListener('touchstart',()=>{
-        holding=true;
-        btn.classList.add('holding');
-    });
-
-    btn.addEventListener('touchend',()=>{
-        if(holding){
-            holding=false;
-            btn.classList.remove('holding');
-            navigate();
-        }
-    });
-
-    btn.addEventListener('touchcancel',()=>{
-        holding=false;
-        btn.classList.remove('holding');
-    });
-});
-</script>
-
 </body>
 </html>
