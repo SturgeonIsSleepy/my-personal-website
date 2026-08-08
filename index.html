@@ -219,4 +219,134 @@
 
         .predictive-btn .btn-preview {
             max-height: 0;
-            opacity: 0
+            opacity: 0;
+            font-size: 0.82rem;
+            color: #666666;
+            transition: all 0.3s ease;
+            line-height: 1.4;
+        }
+
+        /* 按住 (Holding) 触发状态 */
+        .predictive-btn.holding {
+            transform: scale(1.05);
+            background: #ffffff;
+            border-color: var(--accent-blue);
+            box-shadow: 0 8px 20px rgba(0, 102, 255, 0.22);
+            z-index: 10;
+        }
+
+        .predictive-btn.holding .btn-title {
+            color: var(--accent-blue);
+        }
+
+        .predictive-btn.holding .btn-preview {
+            max-height: 80px;
+            opacity: 1;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="top-header">
+        <div class="logo">Sturgeon</div>
+    </header>
+
+    <aside class="sidebar">
+        <div class="sidebar-handle">
+            <span class="handle-title">⚡ 菜单</span>
+            <span class="handle-dot"></span>
+        </div>
+
+        <div class="sidebar-content">
+            <div class="menu-list">
+                <div class="predictive-btn" data-href="mbti.html">
+                    <div class="btn-title">🧠 MBTI 测试 <span>→</span></div>
+                    <div class="btn-preview">探索你的性格类型与内在潜能，提供多维度解析。</div>
+                </div>
+
+                <div class="predictive-btn" data-href="f1.html">
+                    <div class="btn-title">🏎️ F1 赛历 <span>→</span></div>
+                    <div class="btn-preview">实时查阅本赛季一级方程式赛车各分站时间与地点。</div>
+                </div>
+
+                <div class="predictive-btn" data-href="movies.html">
+                    <div class="btn-title">🎬 观影记录 <span>→</span></div>
+                    <div class="btn-preview">记录我看过的影视作品，包含评分与个人独家短评。</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="scroll-container">
+        <section class="page page-1">
+            <div class="hero-title">
+                <h1>这是 Sturgeon 的网站主页</h1>
+                <p>向下滑动探索更多功能 | 点击右上角展开菜单</p>
+            </div>
+        </section>
+
+        <section class="page page-2">
+            <div class="hero-title">
+                <h1>极简 · 灵动 · 沉浸</h1>
+                <p>莫奈调色与 HyperOS 质感的融合</p>
+            </div>
+        </section>
+
+        <section class="page page-3">
+            <div class="hero-title">
+                <h1>热爱生活与探索</h1>
+                <p>速度、性格与光影的汇聚地</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.querySelectorAll('.predictive-btn').forEach(btn => {
+            let isHolding = false;
+
+            btn.addEventListener('mousedown', () => {
+                isHolding = true;
+                btn.classList.add('holding');
+            });
+
+            btn.addEventListener('mouseup', () => {
+                if (isHolding) {
+                    isHolding = false;
+                    btn.classList.remove('holding');
+                    const targetUrl = btn.getAttribute('data-href');
+                    if (targetUrl) window.location.href = targetUrl;
+                }
+            });
+
+            btn.addEventListener('mouseleave', () => {
+                if (isHolding) {
+                    isHolding = false;
+                    btn.classList.remove('holding');
+                }
+            });
+
+            btn.addEventListener('touchstart', () => {
+                isHolding = true;
+                btn.classList.add('holding');
+            });
+
+            btn.addEventListener('touchend', () => {
+                if (isHolding) {
+                    isHolding = false;
+                    btn.classList.remove('holding');
+                    const targetUrl = btn.getAttribute('data-href');
+                    if (targetUrl) window.location.href = targetUrl;
+                }
+            });
+
+            btn.addEventListener('touchcancel', () => {
+                if (isHolding) {
+                    isHolding = false;
+                    btn.classList.remove('holding');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
