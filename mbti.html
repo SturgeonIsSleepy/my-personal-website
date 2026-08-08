@@ -1,76 +1,610 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HATS人格测试</title>
-<style>
-body{font-family:Microsoft YaHei;background:#eef3ef;display:flex;justify-content:center;padding:20px}
-.card{width:420px;background:#fff;border-radius:18px;padding:22px;box-shadow:0 8px 25px rgba(0,0,0,.08)}
-h1{text-align:center;color:#2f5d45}
-.option{border:1px solid #ddd;padding:12px;border-radius:10px;margin-top:10px;cursor:pointer}
-.option.sel{background:#dfeee4;border-color:#2f5d45}
-button{width:100%;padding:14px;background:#2f5d45;color:#fff;border:0;border-radius:12px;font-size:18px;margin-top:20px;cursor:pointer}
-.bar{height:8px;background:#e3e9e5;border-radius:8px;margin:15px 0;overflow:hidden}
-.bar div{height:100%;background:#2f5d45;width:0%}
-.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#2f5d45;color:#fff;padding:10px 18px;border-radius:20px;opacity:0;transition:.4s}
-.geo{width:140px;height:140px;margin:10px auto;display:block}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HATS 人格测试 - Sturgeon</title>
+    <style>
+        :root {
+            --monet-bg-1: #1a1c2e;
+            --monet-bg-2: #3a2240;
+            --monet-bg-3: #1f3540;
+            --accent-glow: rgba(0, 162, 255, 0.4);
+            --radius-main: 32px;
+            --radius-sub: 18px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body, html {
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "MiSans", sans-serif;
+            overflow: hidden;
+            background: #0d0f17;
+            color: #ffffff;
+        }
+
+        /* ================= 莫奈流动色彩背景 ================= */
+        .monet-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            background: radial-gradient(circle at 20% 30%, #3b2d54 0%, transparent 50%),
+                        radial-gradient(circle at 80% 70%, #1d4254 0%, transparent 50%),
+                        radial-gradient(circle at 50% 50%, #2b1f3d 0%, transparent 60%),
+                        linear-gradient(135deg, #0f1019 0%, #16192b 100%);
+            filter: contrast(110%) brightness(95%);
+        }
+
+        .monet-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: floatOrb 18s infinite alternate ease-in-out;
+        }
+
+        .orb-1 { width: 400px; height: 400px; background: #6b3ba7; top: 10%; left: 15%; }
+        .orb-2 { width: 350px; height: 350px; background: #23789f; bottom: 15%; right: 10%; animation-delay: -5s; }
+        .orb-3 { width: 300px; height: 300px; background: #a84b72; top: 50%; left: 60%; animation-delay: -9s; }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(60px, 40px) scale(1.15); }
+        }
+
+        /* ================= 左上角 Sturgeon Logo 返回主页 ================= */
+        .top-header {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            z-index: 100;
+        }
+
+        .logo-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 22px;
+            border-radius: 30px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.08) 100%);
+            backdrop-filter: blur(8px) saturate(170%);
+            -webkit-backdrop-filter: blur(8px) saturate(170%);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: inset 1.5px 1.5px 0px rgba(255, 255, 255, 0.8), 0 8px 20px rgba(0,0,0,0.3);
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .logo-btn:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.15) 100%);
+        }
+
+        /* ================= 主窗口与液态折射玻璃框 ================= */
+        .viewport-container {
+            position: relative;
+            z-index: 10;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* 液态透镜核心卡片 */
+        .liquid-lens-card {
+            position: relative;
+            width: 100%;
+            max-width: 620px;
+            min-height: 540px;
+            border-radius: var(--radius-main);
+            padding: 36px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: transparent; /* 中间完全透明 */
+            overflow: hidden;
+            
+            /* 1. 折射光感多重阴影 & 边缘折光色 */
+            box-shadow: 
+                inset 0 2px 2px 0 rgba(255, 255, 255, 0.9),       /* 顶边强高光 */
+                inset 2px 0 3px 0 rgba(255, 255, 255, 0.4),       /* 左折光 */
+                inset -2px 0 3px 0 rgba(0, 162, 255, 0.3),        /* 右折光提取环境蓝 */
+                inset 0 -2px 3px 0 rgba(168, 75, 114, 0.4),       /* 底折光提取环境粉 */
+                0 20px 50px rgba(0, 0, 0, 0.5);                   /* 悬浮阴影 */
+            
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* 2. 边缘高斯模糊环 (中间透亮，仅边缘高斯模糊与折射) */
+        .liquid-lens-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius-main);
+            padding: 12px; /* 边缘模糊宽度 */
+            background: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.05));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            backdrop-filter: blur(14px) saturate(180%);
+            -webkit-backdrop-filter: blur(14px) saturate(180%);
+            pointer-events: none;
+        }
+
+        /* 3. 折射上移与顶部分散高光 (Optical Displacement Shift) */
+        .liquid-lens-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.95), transparent);
+            box-shadow: 0 1px 8px rgba(255,255,255,0.8);
+            pointer-events: none;
+        }
+
+        /* ================= 内部磨砂玻璃子框 (题目/选项/结果) ================= */
+        .frosted-box {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(16px) saturate(140%);
+            -webkit-backdrop-filter: blur(16px) saturate(140%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius-sub);
+            box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.5), 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        /* --- 页面 1：首页引导 --- */
+        .view-home {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 100%;
+            gap: 28px;
+        }
+
+        .home-badge {
+            padding: 6px 16px;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            color: #8bb2ff;
+            text-transform: uppercase;
+        }
+
+        .home-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1.3;
+            background: linear-gradient(135deg, #ffffff 30%, #b8cbb8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .home-title span {
+            background: linear-gradient(135deg, #00d2ff 0%, #0066ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .start-btn {
+            width: 80%;
+            max-width: 260px;
+            padding: 16px 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ffffff;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.6) 0%, rgba(0, 162, 255, 0.3) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 30px;
+            box-shadow: 0 8px 25px rgba(0, 102, 255, 0.4);
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 12px 30px rgba(0, 102, 255, 0.6);
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.8) 0%, rgba(0, 162, 255, 0.5) 100%);
+        }
+
+        /* --- 页面 2：答题界面 --- */
+        .view-quiz {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 0 4px;
+        }
+
+        .question-card {
+            padding: 22px;
+            font-size: 1.15rem;
+            font-weight: 600;
+            line-height: 1.5;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-item {
+            padding: 15px 18px;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .option-item:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.12) 100%);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: translateX(4px);
+        }
+
+        .option-item:active {
+            transform: scale(0.98);
+        }
+
+        /* --- 页面 3：结果计算页面 --- */
+        .view-result {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 20px;
+        }
+
+        .result-code {
+            font-size: 2.4rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #66a3ff 0%, #00d2ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .result-desc {
+            padding: 20px;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.9);
+            text-align: justify;
+        }
+
+        .restart-btn {
+            margin-top: 10px;
+            padding: 12px 28px;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .restart-btn:hover {
+            background: rgba(255, 255, 255, 0.35);
+        }
+    </style>
 </head>
 <body>
-<div class="toast" id="toast">已选择</div>
-<div class="card" id="app">
-<h1>SBTI已经过时，HATS来了。</h1>
-<p style="text-align:center">原作者：中华鲟</p>
-<div id="quiz"></div>
-</div>
-<script>
-const types=["叛徒","特务","大军阀","走资派","黑手","墙头草","老好人","逆流","小爬虫","变色龙","绊脚石"];
-const desc="你拥有极具戏剧性的个性与幽默精神，擅长在复杂环境中保持独特视角。本测试仅供娱乐。";
-const qs=[
-"我做决定很果断",
-"我认为中华鲟很美味",
-"我喜欢独立行动",
-"我认为人活着是为了去码头整点薯片",
-"我经常怀疑事情动机",
-"我喜欢掌控局面",
-"我更相信规则",
-"我对权威保持怀疑",
-"我更喜欢观察而不是参与",
-"世界本质很复杂"
-];
-let ans=[];
-function toast(){t.style.opacity=1;setTimeout(()=>t.style.opacity=0,900)}
-function render(){
-let html='<div class=bar><div id=p></div></div>';
-qs.forEach((q,i)=>{
-html+=`<b>Q${i+1} ${q}</b>
-<div class='option ${ans[i]==1?'sel':''}' onclick='sel(${i},1,this)'>不同意</div>
-<div class='option ${ans[i]==2?'sel':''}' onclick='sel(${i},2,this)'>中立</div>
-<div class='option ${ans[i]==3?'sel':''}' onclick='sel(${i},3,this)'>同意</div><br>`});
-html+='<button onclick=calc()>查看结果</button>';
-document.getElementById('quiz').innerHTML=html;
-prog();}
-function sel(i,v,e){ans[i]=v;render();toast()}
-function prog(){p.style.width=(ans.filter(Boolean).length/qs.length*100)+'%'}
-function calc(){if(ans.length<qs.length)return alert('请答完');
-let type=types[ans.reduce((a,b)=>a+b)%types.length];
-quiz.innerHTML=`<div class=result style='text-align:center'>
-<h2>你的HATS类型</h2><h1>${type}</h1>
-<svg class='geo' viewBox='0 0 200 200'>
-<circle cx='100' cy='100' r='70' fill='#dfeee4'/>
-<rect x='60' y='60' width='80' height='80' fill='#2f5d45' opacity='0.8'/>
-<polygon points='100,30 170,150 30,150' fill='#88b09a' opacity='0.9'/>
-</svg>
-<p>${desc}</p>
-<p>你可能具备以下特质：</p>
-<p>• 善于在复杂环境中寻找自己的位置<br>
-• 对群体与规则保持独立思考<br>
-• 兼具幽默感与观察力<br>
-• 在关键时刻展现出强烈个人风格</p>
-<p style='font-size:13px;color:#666'>本测试为娱乐向人格分类，请轻松看待结果。</p>
-<button onclick=location.reload()>重新测试</button></div>`}
-render();
-</script>
+
+    <div class="monet-canvas">
+        <div class="monet-orb orb-1"></div>
+        <div class="monet-orb orb-2"></div>
+        <div class="monet-orb orb-3"></div>
+    </div>
+
+    <header class="top-header">
+        <a href="index.html" class="logo-btn">
+            <span>‹</span> Sturgeon
+        </a>
+    </header>
+
+    <main class="viewport-container">
+        <div class="liquid-lens-card">
+
+            <div id="view-home" class="view-home">
+                <div class="frosted-box home-badge">HATS SYSTEM v2.0</div>
+                <h1 class="home-title">
+                    MBTI 已经过时<br>
+                    <span>HATS 来了。</span>
+                </h1>
+                <p style="color: rgba(255,255,255,0.7); font-size: 0.95rem; max-width: 380px;">
+                    基于认知维度（Head）、行动场域（Action）与心灵温度（Temperament）的 27 重人格立体解构。
+                </p>
+                <div class="start-btn" onclick="startQuiz()">开始测试</div>
+            </div>
+
+            <div id="view-quiz" class="view-quiz">
+                <div class="quiz-header">
+                    <span id="quiz-progress-text">QUESTION 01/15</span>
+                    <span id="quiz-dim-tag" class="frosted-box" style="padding: 2px 10px; font-size: 0.75rem;">HEAD 思考维度</span>
+                </div>
+
+                <div class="frosted-box question-card" id="question-text">
+                    </div>
+
+                <div class="options-list" id="options-container">
+                    </div>
+            </div>
+
+            <div id="view-result" class="view-result">
+                <div class="frosted-box" style="padding: 6px 18px; font-size: 0.8rem; color: #8bb2ff;">HATS 终极检测判定</div>
+                <div class="result-code" id="res-code">H1 - A2 - T3</div>
+                <div class="result-title" id="res-title">【深海折射者】</div>
+                <div class="frosted-box result-desc" id="res-desc">
+                    </div>
+                <button class="restart-btn" onclick="resetQuiz()">重新测试</button>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        /* ================= 15 道测试题定义 (对应 H, A, T 三大维度) ================= */
+        const questions = [
+            // Head 维度 (H1: 逻辑分析, H2: 直觉灵感, H3: 实用经验)
+            { dim: 'H', text: "1. 面对未知新事物时，你的第一反应往往是？", options: [
+                { text: "剖析内部逻辑与底层机制", val: 'H1' },
+                { text: "联想到某种隐喻或未来可能性", val: 'H2' },
+                { text: "关注其实用价值与现实应用", val: 'H3' },
+                { text: "先观察他人的反应与评价", val: 'H1' }
+            ]},
+            { dim: 'H', text: "2. 当你思考一个复杂难题时，你的脑海更像？", options: [
+                { text: "精密运转的逻辑树结构", val: 'H1' },
+                { text: "万花筒般交织的灵感闪光", val: 'H2' },
+                { text: "工具箱里清晰分类的解决方案", val: 'H3' },
+                { text: "逐步推演的步骤流程图", val: 'H1' }
+            ]},
+            { dim: 'H', text: "3. 评价一本书或一部电影时，你最看重？", options: [
+                { text: "架构是否严密，逻辑能否自洽", val: 'H1' },
+                { text: "意象是否深远，能否带来灵魂启发", val: 'H2' },
+                { text: "情节是否接地气，能否映照现实生活", val: 'H3' },
+                { text: "细节处理是否精致有条理", val: 'H1' }
+            ]},
+            { dim: 'H', text: "4. 你做决断时最依赖的依据是？", options: [
+                { text: "客观事实与数据推演", val: 'H1' },
+                { text: "瞬间的直觉与整体灵感", val: 'H2' },
+                { text: "过往验证过的成功经验", val: 'H3' },
+                { text: "反复论证后的概率胜率", val: 'H1' }
+            ]},
+            { dim: 'H', text: "5. 你如何看待未被证实的理论？", options: [
+                { text: "保持怀疑，直至获得证据支持", val: 'H1' },
+                { text: "充满兴致，尝试展开想象推演", val: 'H2' },
+                { text: "暂不关心，除非它对我当下有用", val: 'H3' },
+                { text: "拆解其推论过程寻找漏洞", val: 'H1' }
+            ]},
+
+            // Action 维度 (A1: 极速开拓, A2: 协调平衡, A3: 深度沉浸)
+            { dim: 'A', text: "6. 团队项目中，你最习惯扮演的角色是？", options: [
+                { text: "带头冲锋、掌控节奏的推进者", val: 'A1' },
+                { text: "润滑关系、整合资源的协调者", val: 'A2' },
+                { text: "专精突破攻坚难题的潜行者", val: 'A3' },
+                { text: "把控全局方向的指挥者", val: 'A1' }
+            ]},
+            { dim: 'A', text: "7. 面对突发变故，你的行动策略是？", options: [
+                { text: "果断采取行动，边做边修正", val: 'A1' },
+                { text: "安抚大家情绪，稳住阵脚求平衡", val: 'A2' },
+                { text: "静心观察局势，寻找最佳切入点", val: 'A3' },
+                { text: "迅速制定应急预案即刻执行", val: 'A1' }
+            ]},
+            { dim: 'A', text: "8. 你的日常工作/学习节奏更接近？", options: [
+                { text: "爆发力强，快速搞定下一项挑战", val: 'A1' },
+                { text: "平稳匀速，注重劳逸结合与秩序", val: 'A2' },
+                { text: "心流驱动，进入状态就彻底忘我", val: 'A3' },
+                { text: "高效推进，绝不拖泥拉水", val: 'A1' }
+            ]},
+            { dim: 'A', text: "9. 对于规章与既定流程，你的态度是？", options: [
+                { text: "妨碍效率时，会主动打破规则", val: 'A1' },
+                { text: "遵守并优化，让大家合作更顺畅", val: 'A2' },
+                { text: "保持距离，自由构建自己的系统", val: 'A3' },
+                { text: "借力规章快速达成个人目标", val: 'A1' }
+            ]},
+            { dim: 'A', text: "10. 当精力消耗过多时，你恢复能量的方式是？", options: [
+                { text: "通过一场激烈的运动或挑战释放", val: 'A1' },
+                { text: "与懂自己的朋友轻松交流倾诉", val: 'A2' },
+                { text: "独处在封闭空间里安静沉思", val: 'A3' },
+                { text: "快速完成一件有成就感的小事", val: 'A1' }
+            ]},
+
+            // Temperament 维度 (T1: 清冷冷静, T2: 炽热共情, T3: 哲思超然)
+            { dim: 'T', text: "11. 当朋友向你倾诉苦恼时，你的自然反应是？", options: [
+                { text: "迅速理清因果，帮他分析解决办法", val: 'T1' },
+                { text: "感同身受，第一时间给予情感拥抱", val: 'T2' },
+                { text: "跳出局限，引导他从更高视角看待", val: 'T3' },
+                { text: "冷静听完，给出客观中立评估", val: 'T1' }
+            ]},
+            { dim: 'T', text: "12. 艺术作品（音乐、绘画）最打动你的是？", options: [
+                { text: "严谨的结构与极致的技术美感", val: 'T1' },
+                { text: "浓烈情感的爆发与心灵共振", val: 'T2' },
+                { text: "蕴含的深邃哲理与神秘意境", val: 'T3' },
+                { text: "精妙的配色与构图秩序", val: 'T1' }
+            ]},
+            { dim: 'T', text: "13. 你的情感表达模式更偏向？", options: [
+                { text: "内敛克制，极少表露剧烈情绪", val: 'T1' },
+                { text: "真诚热烈，喜怒哀乐感染力强", val: 'T2' },
+                { text: "超然淡泊，如水般包容流动", val: 'T3' },
+                { text: "情绪稳定，始终保持理性", val: 'T1' }
+            ]},
+            { dim: 'T', text: "14. 面对生活中的摩擦或争执，你倾向于？", options: [
+                { text: "讲清道理，按对错逻辑解决", val: 'T1' },
+                { text: "照顾感受，优先修复人际温度", val: 'T2' },
+                { text: "顺其自然，相信时间会淡化一切", val: 'T3' },
+                { text: "冷淡处理，不浪费无谓精力", val: 'T1' }
+            ]},
+            { dim: 'T', text: "15. 你理想中的人生状态更接近？", options: [
+                { text: "掌控自我，清醒无虞地穿过风浪", val: 'T1' },
+                { text: "热烈爱恨，无悔体验人世间温情", val: 'T2' },
+                { text: "通透悟道，与天地万物达成和解", val: 'T3' },
+                { text: "理性独立，拥有坚不可摧的内心", val: 'T1' }
+            ]}
+        ];
+
+        /* ================= 27 种 HATS 结果短评数据库 ================= */
+        const hatsResults = {
+            'H1-A1-T1': { title: '【星核领航官】', desc: '拥有绝对理性的头脑与雷厉风行的执行力，眼神如冰原般清澈。你是天然的破局者，不被情绪裹挟，永远用最精密的逻辑与最快的速度直击事物本质。' },
+            'H1-A1-T2': { title: '【钢铁圣骑士】', desc: '既有严密的思维与极强的突破力，又怀揣着炽热的共情之心。你用理智构建利剑，却用温度守护弱者，是知行合一且充满正义感的人格典范。' },
+            'H1-A1-T3': { title: '【量子观测者】', desc: '行动迅速却又带着超然物外的通透。你看透规则却依然高效利用规则，像是在人间进行一场精密实验，冷眼旁观却能精准改变局势走向。' },
+
+            'H1-A2-T1': { title: '【晶体架构师】', desc: '追求秩序与严密逻辑，善于构建和谐稳定的系统。你如水银泄地般冷静而周全，总是能将混乱无序的局面调理为一丝不苟的完美晶体。' },
+            'H1-A2-T2': { title: '【理性守护者】', desc: '兼具逻辑推演力与极高情商，是团队中最可信赖的粘合剂。你用理性分析解决实际困难，用细腻温情化解人际冰霜。' },
+            'H1-A2-T3': { title: '【隐世策士】', desc: '逻辑严密、态度温和且心灵超然。你不强求主导权，却能在润物细无声中用高维度的智慧引导局势，展现出大智若愚的东方哲思。' },
+
+            'H1-A3-T1': { title: '【深海极客】', desc: '极度专注、理性而清冷。当你潜入某个专业领域时，世界便只剩下你与真理。你的孤独是极具质量的，能在静默中孕育出撼动人心的成果。' },
+            'H1-A3-T2': { title: '【匠心铸造师】', desc: '用严谨的逻辑打磨作品，同时注入了充沛的情感。你对细节有着偏执的追求，每一件产出都是理性结构与感性灵魂的完美交融。' },
+            'H1-A3-T3': { title: '【孤峰学者】', desc: '思维严密，沉浸于自己的宇宙。你早已超越了俗世的纷扰与评价，在漫长的探索中与真理同行，散发着独树一帜的通透幽香。' },
+
+            'H2-A1-T1': { title: '【灵光开拓者】', desc: ' intuition 极度敏锐，行动快如闪电。你总能凭直觉捕捉到未来的微光，并毫不犹豫地率先破空而出，是时代浪潮前沿的预言家与先锋。' },
+            'H2-A1-T2': { title: '【梦境狂想家】', desc: '充满了天马行空的想象力与无所畏惧的热情。你的能量像璀璨的烟花，不断用绚丽的创意点燃身边的人，带大家去往未曾设想的前方。' },
+            'H2-A1-T3': { title: '【风暴穿行者】', desc: '直觉敏锐且超然洒脱。你敢于拥抱未知与风险，因为你深知世界的本质即是流动。你在风暴中穿行，如同进行一场优雅的艺术舞蹈。' },
+
+            'H2-A2-T1': { title: '【灵动交响者】', desc: '能将虚无缥缈的灵感转化为优雅的秩序。你的逻辑不死板，充满跳跃与灵性，善于在人与人之间搭建桥梁，编织出美妙的合作乐章。' },
+            'H2-A2-T2': { title: '【灵魂治愈师】', desc: '拥有洞察灵魂的直觉与无微不至的炽热情感。你如同一缕温热的阳光，总能精准感知他人的苦痛与渴望，用创意与爱弥合伤痕。' },
+            'H2-A2-T3': { title: '【诗意栖居者】', desc: '直觉丰富，气质通透自然。你用诗意的眼光看待世界，不激进、不执念，在人世间漫步，随缘抚慰着遇到的每一个人。' },
+
+            'H2-A3-T1': { title: '【幻象破译官】', desc: '直觉极强，习惯独处探索。你的大脑是个浩瀚的潜意识宇宙，能在看似毫无关联的事物间建立神秘联系，破译出深层次的规律。' },
+            'H2-A3-T2': { title: '【浪漫艺术家】', desc: '灵魂深处淌着浓烈的诗意与灵感。你不需要向世界证明什么，只需要用独特的艺术表达将内心的奇幻光影具象化，令人流连忘返。' },
+            'H2-A3-T3': { title: '【虚空吟游诗人】', desc: '灵感如星河，心灵如太虚。你游离于现实边缘，用深邃而超然的视线凝视万物，你的思想是属于未来与宇宙的遗迹。' },
+
+            'H3-A1-T1': { title: '【硬核执行官】', desc: '实用主义的巅峰代表，兼具冷静与铁血手段。你只看重结果与效率，任何虚无缥缈的幻想在你面前都会被现实的重锤击碎。' },
+            'H3-A1-T2': { title: '【热血实干家】', desc: '务实接地气，且对生活充满了真挚的热情。你充满干劲，脚踏实地，用双手一步一个脚印筑起属于自己的坚固城堡。' },
+            'H3-A1-T3': { title: '【大地游侠】', desc: '极为实用却又旷达超然。你脚踏实地做事，心却不为名利所累，宛如游历世间的侠客，干脆利落，潇洒自在。' },
+
+            'H3-A2-T1': { title: '【基石建造者】', desc: '务实、可靠且极具条理。你是社会与团队中最坚实的基石，用稳健的步伐与冷静的头脑维护着庞大系统的正常运转。' },
+            'H3-A2-T2': { title: '【温暖守护者】', desc: '用最接地气的方式去爱与关怀。你不会说虚幻的花言巧语，但会为你做一顿热饭、修好一把坏掉的椅子，真挚而充满力量。' },
+            'H3-A2-T3': { title: '【农禅生活家】', desc: '务实生活，心怀禅意。你在柴米油盐中体会天地之道，在平凡琐碎里寻得安宁，是真正将高深哲思融入日常生活的高人。' },
+
+            'H3-A3-T1': { title: '【冷峻机械师】', desc: '专注实效，冷静内敛。你如同一台精密运转的高能机械，不浪费任何一毫能量在无意义的社交上，只追求极致的实用与稳定。' },
+            'H3-A3-T2': { title: '【执着守艺人】', desc: '沉静务实，情感细腻而专注。你一生或许只做好一件事，将全部的热爱与精力倾注在手中的实体上，耐得住寂寞，守得住初心。' },
+            'H3-A3-T3': { title: '【隐市扫地僧】', desc: '务实潜行，看淡荣辱。你拥有极其扎实的实操能力，却甘于平凡深藏不露，在静默中默默积蓄着令人惊叹的力量。' }
+        };
+
+        /* ================= 答题逻辑状态管理 ================= */
+        let currentIdx = 0;
+        let userScores = { H: {}, A: {}, T: {} };
+
+        function startQuiz() {
+            document.getElementById('view-home').style.display = 'none';
+            document.getElementById('view-quiz').style.display = 'flex';
+            currentIdx = 0;
+            userScores = { H: {}, A: {}, T: {} };
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = questions[currentIdx];
+            
+            // 更新进度与标签
+            document.getElementById('quiz-progress-text').innerText = `QUESTION ${String(currentIdx + 1).padStart(2, '0')}/15`;
+            
+            const dimNames = { H: 'HEAD 思考维度', A: 'ACTION 行动维度', T: 'TEMPERAMENT 气质维度' };
+            document.getElementById('quiz-dim-tag').innerText = dimNames[q.dim];
+
+            // 更新问题
+            document.getElementById('question-text').innerText = q.text;
+
+            // 更新选项
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            q.options.forEach((opt, index) => {
+                const optEl = document.createElement('div');
+                optEl.className = 'frosted-box option-item';
+                optEl.innerHTML = `<span>${String.fromCharCode(65 + index)}. ${opt.text}</span><span style="opacity:0.6; font-size:0.8rem;">→</span>`;
+                optEl.onclick = () => selectOption(q.dim, opt.val);
+                container.appendChild(optEl);
+            });
+        }
+
+        function selectOption(dim, val) {
+            userScores[dim][val] = (userScores[dim][val] || 0) + 1;
+
+            currentIdx++;
+            if (currentIdx < questions.length) {
+                renderQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function getTopVal(dimObj, defaultVal) {
+            let maxKey = defaultVal;
+            let maxCount = -1;
+            for (let k in dimObj) {
+                if (dimObj[k] > maxCount) {
+                    maxCount = dimObj[k];
+                    maxKey = k;
+                }
+            }
+            return maxKey;
+        }
+
+        function showResult() {
+            document.getElementById('view-quiz').style.display = 'none';
+            document.getElementById('view-result').style.display = 'flex';
+
+            // 统计得出 H, A, T 最高极性
+            const resH = getTopVal(userScores.H, 'H1');
+            const resA = getTopVal(userScores.A, 'A1');
+            const resT = getTopVal(userScores.T, 'T1');
+
+            const resultCode = `${resH}-${resA}-${resT}`;
+            const resData = hatsResults[resultCode] || hatsResults['H1-A1-T1'];
+
+            document.getElementById('res-code').innerText = resultCode;
+            document.getElementById('res-title').innerText = resData.title;
+            document.getElementById('res-desc').innerText = resData.desc;
+        }
+
+        function resetQuiz() {
+            document.getElementById('view-result').style.display = 'none';
+            document.getElementById('view-home').style.display = 'flex';
+        }
+    </script>
 </body>
 </html>

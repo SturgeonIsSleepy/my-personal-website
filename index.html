@@ -5,14 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sturgeon - 个人主页</title>
     <style>
-        /* ================= 莫奈取色与 全局变量 ================= */
+        /* ================= 核心全局变量 ================= */
         :root {
-            --accent-blue: #0066ff;
+            --glass-tint-blue: rgba(0, 122, 255, 0.15);
+            --glass-tint-active: rgba(0, 162, 255, 0.28);
             --miui-radius-lg: 28px;
-            --miui-radius-sm: 16px;
+            --miui-radius-sm: 18px;
             
-            /* 清透折射玻璃滤镜 */
-            --liquid-glass-filter: blur(8px) saturate(170%) contrast(105%);
+            /* 动态光源坐标 */
+            --mx: 50%;
+            --my: 30%;
         }
 
         * {
@@ -26,98 +28,10 @@
             height: 100%;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "MiSans", sans-serif;
             overflow: hidden;
-            background-color: #0f1015;
+            background-color: #0b0c10;
         }
 
-        /* ================= 左上角 Logo 标识 & 折射玻璃展开菜单 ================= */
-        .top-header {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 200;
-        }
-
-        .logo-menu {
-            /* 默认状态：左上角折射玻璃小胶囊 */
-            width: 115px;
-            height: 42px;
-            border-radius: 25px;
-            padding: 0 16px;
-            
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.08) 100%);
-            backdrop-filter: var(--liquid-glass-filter);
-            -webkit-backdrop-filter: var(--liquid-glass-filter);
-            
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 
-                inset 1.5px 1.5px 0px 0px rgba(255, 255, 255, 0.9),
-                inset -1.5px -1.5px 1px 0px rgba(0, 0, 0, 0.2),
-                inset 0 0 15px 0 rgba(255, 255, 255, 0.2),
-                0 12px 32px rgba(0, 0, 0, 0.25);
-            
-            overflow: hidden;
-            transition: all 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.12);
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* 悬停或激活（点击）时展开 */
-        .logo-menu:hover, .logo-menu.active {
-            width: 270px;
-            height: auto;
-            max-height: 80vh;
-            border-radius: var(--miui-radius-lg);
-            padding: 16px 16px 20px 16px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0.15) 100%);
-            box-shadow: 
-                inset 2px 2px 1px 0px rgba(255, 255, 255, 0.95),
-                inset -1.5px -1.5px 1px 0px rgba(0, 0, 0, 0.2),
-                inset 0 0 20px 0 rgba(255, 255, 255, 0.25),
-                0 20px 48px rgba(0, 0, 0, 0.35);
-        }
-
-        .logo-handle {
-            height: 42px;
-            min-height: 42px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-        }
-
-        .logo-handle .logo-title {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: #ffffff;
-            letter-spacing: 0.5px;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-        }
-
-        .logo-handle .logo-arrow {
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.8);
-            transition: transform 0.3s ease;
-        }
-
-        .logo-menu:hover .logo-arrow, .logo-menu.active .logo-arrow {
-            transform: rotate(180deg);
-        }
-
-        .logo-content {
-            opacity: 0;
-            transform: translateY(-8px) scale(0.98);
-            transition: opacity 0.35s ease 0.1s, transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s;
-            pointer-events: none;
-            margin-top: 10px;
-        }
-
-        .logo-menu:hover .logo-content, .logo-menu.active .logo-content {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            pointer-events: auto;
-        }
-
-        /* ================= 全屏图片/渐变滑动 ================= */
+        /* ================= 全屏背景与滑动 ================= */
         .scroll-container {
             height: 100vh;
             overflow-y: scroll;
@@ -138,21 +52,21 @@
         }
 
         .page-1 {
-            background: linear-gradient(135deg, rgba(43,50,178,0.7) 0%, rgba(20,136,204,0.7) 100%), 
+            background: linear-gradient(135deg, rgba(43,50,178,0.6) 0%, rgba(20,136,204,0.6) 100%), 
                         url('images/bg1.jpg'), url('https://picsum.photos/id/1015/1920/1080');
             background-size: cover;
             background-blend-mode: overlay;
         }
 
         .page-2 {
-            background: linear-gradient(135deg, rgba(58,28,113,0.7) 0%, rgba(215,109,119,0.7) 100%), 
+            background: linear-gradient(135deg, rgba(58,28,113,0.6) 0%, rgba(215,109,119,0.6) 100%), 
                         url('images/bg2.jpg'), url('https://picsum.photos/id/1043/1920/1080');
             background-size: cover;
             background-blend-mode: overlay;
         }
 
         .page-3 {
-            background: linear-gradient(135deg, rgba(31,64,55,0.7) 0%, rgba(153,242,200,0.7) 100%), 
+            background: linear-gradient(135deg, rgba(31,64,55,0.6) 0%, rgba(153,242,200,0.6) 100%), 
                         url('images/bg3.jpg'), url('https://picsum.photos/id/1039/1920/1080');
             background-size: cover;
             background-blend-mode: overlay;
@@ -163,51 +77,163 @@
             z-index: 2;
             text-align: center;
             color: #ffffff;
-            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            text-shadow: 0 4px 28px rgba(0,0,0,0.5);
             padding: 0 20px;
         }
 
         .hero-title h1 {
-            font-size: 2.4rem;
-            font-weight: 600;
+            font-size: 2.6rem;
+            font-weight: 700;
             margin-bottom: 12px;
             letter-spacing: -0.5px;
         }
 
         .hero-title p {
             font-size: 1.05rem;
-            opacity: 0.85;
+            opacity: 0.88;
             letter-spacing: 0.5px;
         }
 
-        /* ================= 清透折射玻璃右上角菜单 ================= */
+        /* ================= 真实液态折射玻璃材质 ================= */
+        .glass-container {
+            position: relative;
+            background: rgba(255, 255, 255, 0.08);
+            
+            /* 1. 关联纯 SVG 折射滤镜 + 降级兼容高斯模糊与高饱和度 */
+            backdrop-filter: url("#liquid-glass-filter") blur(4px) saturate(190%) contrast(105%);
+            -webkit-backdrop-filter: blur(12px) saturate(190%) contrast(105%);
+            
+            /* 2. 精细双层立体切面边框 */
+            border: 1px solid rgba(255, 255, 255, 0.65);
+            
+            /* 3. 凸透镜边缘光感（顶光、底影、左右光谱色散） */
+            box-shadow: 
+                inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95),        /* 顶部高光切面 */
+                inset 0 -2px 4px 0 rgba(0, 0, 0, 0.3),               /* 底部影深 */
+                inset 2.5px 0 6px 0 rgba(255, 255, 255, 0.45),        /* 左边缘折射 */
+                inset -2.5px 0 6px 0 rgba(0, 162, 255, 0.4),         /* 右边缘蓝散 */
+                0 16px 40px rgba(0, 0, 0, 0.35);                     /* 外部浮空阴影 */
+            
+            /* 4. 液态弹性形变动画 */
+            transition: width 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        height 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        border-radius 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        padding 0.35s ease,
+                        background 0.35s ease,
+                        box-shadow 0.35s ease;
+        }
+
+        /* 动态表面高光追踪 */
+        .glass-container::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: radial-gradient(
+                450px circle at var(--mx) var(--my), 
+                rgba(255, 255, 255, 0.38), 
+                transparent 70%
+            );
+            pointer-events: none;
+            opacity: 0.85;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+        }
+
+        /* ================= 左上角 Logo 菜单 ================= */
+        .top-header {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 200;
+        }
+
+        .logo-menu {
+            width: 120px;
+            height: 42px;
+            border-radius: 25px;
+            padding: 0 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .logo-menu:hover, .logo-menu.active {
+            width: 280px;
+            height: auto;
+            max-height: 80vh;
+            border-radius: var(--miui-radius-lg);
+            padding: 16px 16px 20px 16px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, var(--glass-tint-blue) 100%);
+            border-color: rgba(255, 255, 255, 0.85);
+            box-shadow: 
+                inset 0 2px 2px 0 rgba(255, 255, 255, 1),
+                inset 0 -3px 6px 0 rgba(0, 0, 0, 0.35),
+                inset 4px 0 8px 0 rgba(255, 255, 255, 0.5),
+                inset -4px 0 8px 0 rgba(0, 162, 255, 0.45),
+                0 24px 48px rgba(0, 0, 0, 0.45);
+        }
+
+        .logo-handle {
+            height: 42px;
+            min-height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo-handle .logo-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .logo-handle .logo-arrow {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.9);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .logo-menu:hover .logo-arrow, .logo-menu.active .logo-arrow {
+            transform: rotate(180deg);
+        }
+
+        .logo-content {
+            opacity: 0;
+            transform: translateY(-8px) scale(0.98);
+            transition: opacity 0.35s ease 0.08s, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.08s;
+            pointer-events: none;
+            margin-top: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo-menu:hover .logo-content, .logo-menu.active .logo-content {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        /* ================= 右上角 Liquid Glass 侧边栏 ================= */
         .sidebar {
             position: fixed;
             top: 20px;
             right: 20px;
             z-index: 200;
             
-            /* 收起状态：玻璃胶囊 */
             width: 100px;
             height: 42px;
             border-radius: 25px;
             padding: 0 16px;
-            
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.08) 100%);
-            backdrop-filter: var(--liquid-glass-filter);
-            -webkit-backdrop-filter: var(--liquid-glass-filter);
-            
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 
-                inset 1.5px 1.5px 0px 0px rgba(255, 255, 255, 0.9),
-                inset -1.5px -1.5px 1px 0px rgba(0, 0, 0, 0.2),
-                inset 0 0 15px 0 rgba(255, 255, 255, 0.2),
-                0 12px 32px rgba(0, 0, 0, 0.25);
-            
             overflow: hidden;
-            transition: all 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.12);
             display: flex;
             flex-direction: column;
+            cursor: pointer;
         }
 
         .sidebar:hover {
@@ -216,12 +242,14 @@
             max-height: 80vh;
             border-radius: var(--miui-radius-lg);
             padding: 18px 18px 22px 18px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0.15) 100%);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, var(--glass-tint-blue) 100%);
+            border-color: rgba(255, 255, 255, 0.85);
             box-shadow: 
-                inset 2px 2px 1px 0px rgba(255, 255, 255, 0.95),
-                inset -1.5px -1.5px 1px 0px rgba(0, 0, 0, 0.2),
-                inset 0 0 20px 0 rgba(255, 255, 255, 0.25),
-                0 20px 48px rgba(0, 0, 0, 0.35);
+                inset 0 2px 2px 0 rgba(255, 255, 255, 1),
+                inset 0 -3px 6px 0 rgba(0, 0, 0, 0.35),
+                inset 4px 0 8px 0 rgba(255, 255, 255, 0.5),
+                inset -4px 0 8px 0 rgba(0, 162, 255, 0.45),
+                0 24px 48px rgba(0, 0, 0, 0.45);
         }
 
         .sidebar-handle {
@@ -230,7 +258,6 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            cursor: pointer;
             position: relative;
             z-index: 2;
         }
@@ -239,11 +266,10 @@
             font-size: 0.92rem;
             font-weight: 600;
             color: #ffffff;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
             display: flex;
             align-items: center;
             gap: 6px;
-            white-space: nowrap;
         }
 
         .sidebar-handle .handle-dot {
@@ -257,7 +283,7 @@
         .sidebar-content {
             opacity: 0;
             transform: translateY(-8px) scale(0.98);
-            transition: opacity 0.35s ease 0.1s, transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s;
+            transition: opacity 0.35s ease 0.08s, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.08s;
             pointer-events: none;
             margin-top: 10px;
             position: relative;
@@ -273,57 +299,89 @@
         .menu-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
 
-        /* ================= 折射玻璃小卡片按钮 ================= */
-        .predictive-btn {
+        /* ================= 融合玻璃子按键 ================= */
+        .glass-item {
             position: relative;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 100%);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
+            background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.45);
             border-radius: var(--miui-radius-sm);
-            padding: 14px 16px;
+            padding: 13px 15px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
             box-shadow: 
-                inset 1px 1px 0px 0 rgba(255, 255, 255, 0.7),
-                0 4px 12px rgba(0,0,0,0.1);
+                inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.75),
+                inset 0 -1px 2px 0 rgba(0, 0, 0, 0.18),
+                0 4px 12px rgba(0,0,0,0.12);
             overflow: hidden;
         }
 
-        .predictive-btn .btn-title {
-            font-size: 0.95rem;
+        .glass-item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: radial-gradient(
+                200px circle at var(--mx) var(--my), 
+                rgba(255, 255, 255, 0.35), 
+                transparent 70%
+            );
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .glass-item:hover::before {
+            opacity: 1;
+        }
+
+        .glass-item .btn-title {
+            font-size: 0.92rem;
             font-weight: 600;
             color: #ffffff;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: relative;
+            z-index: 2;
         }
 
-        .predictive-btn .btn-preview {
+        .glass-item .btn-preview {
             max-height: 0;
             opacity: 0;
             font-size: 0.82rem;
-            color: rgba(255, 255, 255, 0.9);
-            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.92);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             line-height: 1.4;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 2;
         }
 
-        .predictive-btn.holding {
-            transform: scale(1.04);
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.2) 100%);
+        .glass-item:hover {
             border-color: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.18);
             box-shadow: 
-                inset 1.5px 1.5px 0px 0 rgba(255, 255, 255, 0.95),
-                0 8px 24px rgba(0, 102, 255, 0.35);
+                inset 0 1.5px 3px 0 rgba(255, 255, 255, 0.95),
+                inset 0 -1.5px 3px 0 rgba(0, 0, 0, 0.25),
+                0 6px 18px rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .glass-item.holding {
+            transform: scale(1.02);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.28) 0%, var(--glass-tint-active) 100%);
+            border-color: rgba(255, 255, 255, 1);
+            box-shadow: 
+                inset 0 2px 4px 0 rgba(255, 255, 255, 1),
+                0 8px 24px rgba(0, 122, 255, 0.4);
             z-index: 10;
         }
 
-        .predictive-btn.holding .btn-preview {
+        .glass-item.holding .btn-preview {
             max-height: 80px;
             opacity: 1;
             margin-top: 8px;
@@ -332,20 +390,31 @@
 </head>
 <body>
 
+    <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true">
+        <defs>
+            <filter id="liquid-glass-filter" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+                <feTurbulence type="fractalNoise" baseFrequency="0.015 0.02" numOctaves="2" result="noise" />
+                <feGaussianBlur in="noise" stdDeviation="4" result="softNoise" />
+                <feDisplacementMap in="SourceGraphic" in2="softNoise" scale="22" xChannelSelector="R" yChannelSelector="G" result="displaced" />
+                <feColorMatrix type="saturate" values="1.6" in="displaced" result="final" />
+            </filter>
+        </defs>
+    </svg>
+
     <header class="top-header">
-        <div class="logo-menu" id="logoMenu">
+        <div class="logo-menu glass-container" id="logoMenu">
             <div class="logo-handle">
                 <span class="logo-title">Sturgeon</span>
                 <span class="logo-arrow">▾</span>
             </div>
             <div class="logo-content">
                 <div class="menu-list">
-                    <div class="predictive-btn" data-href="changelog.html">
+                    <div class="glass-item predictive-btn" data-href="changelog.html">
                         <div class="btn-title">📝 开发日志 <span>→</span></div>
                         <div class="btn-preview">查看网站的版本迭代记录、功能更新与修补日志。</div>
                     </div>
 
-                    <div class="predictive-btn" data-href="https://github.com/SturgeonIsSleepy/guest.sturgeon.ccwu.cc" data-external="true">
+                    <div class="glass-item predictive-btn" data-href="https://github.com/your-username/my-personal-website" data-external="true">
                         <div class="btn-title">💻 网站源代码 <span>→</span></div>
                         <div class="btn-preview">前往 GitHub 查看项目开源仓库、代码结构与资源。</div>
                     </div>
@@ -354,7 +423,7 @@
         </div>
     </header>
 
-    <aside class="sidebar">
+    <aside class="sidebar glass-container">
         <div class="sidebar-handle">
             <span class="handle-title">⚡ 菜单</span>
             <span class="handle-dot"></span>
@@ -362,17 +431,17 @@
 
         <div class="sidebar-content">
             <div class="menu-list">
-                <div class="predictive-btn" data-href="mbti.html">
-                    <div class="btn-title">🧠 MBTI 测试 <span>→</span></div>
-                    <div class="btn-preview">探索你的性格类型与内在潜能，提供多维度解析。</div>
+                <div class="glass-item predictive-btn" data-href="mbti.html">
+                    <div class="btn-title">🧠 HATS 测试 <span>→</span></div>
+                    <div class="btn-preview">探索你的 27 重 HATS 人格模型与内在潜能。</div>
                 </div>
 
-                <div class="predictive-btn" data-href="f1.html">
+                <div class="glass-item predictive-btn" data-href="f1.html">
                     <div class="btn-title">🏎️ F1 赛历 <span>→</span></div>
                     <div class="btn-preview">实时查阅本赛季一级方程式赛车各分站时间与地点。</div>
                 </div>
 
-                <div class="predictive-btn" data-href="movies.html">
+                <div class="glass-item predictive-btn" data-href="movies.html">
                     <div class="btn-title">🎬 观影记录 <span>→</span></div>
                     <div class="btn-preview">记录我看过的影视作品，包含评分与个人独家短评。</div>
                 </div>
@@ -391,7 +460,7 @@
         <section class="page page-2">
             <div class="hero-title">
                 <h1>极简 · 灵动 · 沉浸</h1>
-                <p>透亮折射玻璃与莫奈调色的融合</p>
+                <p>原生 SVG 液态折射透镜与玻璃质感渲染</p>
             </div>
         </section>
 
@@ -404,7 +473,19 @@
     </main>
 
     <script>
-        // --- 1. 左上角 Logo 菜单点击控制 ---
+        // 1. 动态物理光斑追踪
+        document.addEventListener('mousemove', (e) => {
+            const containers = document.querySelectorAll('.glass-container, .glass-item');
+            containers.forEach(el => {
+                const rect = el.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                el.style.setProperty('--mx', `${x}px`);
+                el.style.setProperty('--my', `${y}px`);
+            });
+        });
+
+        // 2. 左上角 Logo 菜单展开控制
         const logoMenu = document.getElementById('logoMenu');
         const logoHandle = logoMenu.querySelector('.logo-handle');
 
@@ -413,14 +494,13 @@
             logoMenu.classList.toggle('active');
         });
 
-        // 点击页面空白处关闭左上角菜单
         document.addEventListener('click', (e) => {
             if (!logoMenu.contains(e.target)) {
                 logoMenu.classList.remove('active');
             }
         });
 
-        // --- 2. 通用“预测性长按/点击”逻辑 ---
+        // 3. 按压高亮与预测跳转逻辑
         document.querySelectorAll('.predictive-btn').forEach(btn => {
             let isHolding = false;
 
