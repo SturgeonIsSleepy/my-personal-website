@@ -24,32 +24,32 @@
             height: 100%;
             font-family: -apple-system, BlinkMacSystemFont, "MiSans", "PingFang SC", sans-serif;
             overflow: hidden;
-            background-color: #1a1b26; /* 兜底深色背景 */
+            background-color: #1a1b26;
         }
 
         /* ================= 左上角 Logo 标识 ================= */
         .top-header {
             position: fixed;
             top: 20px;
-            left: 30px;
+            left: 20px;
             z-index: 100;
         }
 
         .logo {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: #ffffff;
             letter-spacing: 1px;
             background: rgba(0, 0, 0, 0.35);
             backdrop-filter: var(--blur-glass);
             -webkit-backdrop-filter: var(--blur-glass);
-            padding: 8px 24px;
-            border-radius: var(--miui-radius-lg);
+            padding: 8px 20px;
+            border-radius: 22px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        /* ================= 全屏图片/渐变滑动 (一页一张图) ================= */
+        /* ================= 全屏图片/渐变滑动 ================= */
         .scroll-container {
             height: 100vh;
             overflow-y: scroll;
@@ -69,24 +69,23 @@
             background-position: center;
         }
 
-        /* 莫奈渐变 + 备用图（即使图片未加载，也有极美渐变色） */
         .page-1 {
-            background: linear-gradient(135deg, rgba(43,50,178,0.85) 0%, rgba(20,136,204,0.85) 100%), 
-                        url('https://picsum.photos/id/1015/1920/1080');
+            background: linear-gradient(135deg, rgba(43,50,178,0.7) 0%, rgba(20,136,204,0.7) 100%), 
+                        url('images/bg1.jpg'), url('https://picsum.photos/id/1015/1920/1080');
             background-size: cover;
             background-blend-mode: overlay;
         }
 
         .page-2 {
-            background: linear-gradient(135deg, rgba(58,28,113,0.85) 0%, rgba(215,109,119,0.85) 50%, rgba(255,175,123,0.85) 100%), 
-                        url('https://picsum.photos/id/1043/1920/1080');
+            background: linear-gradient(135deg, rgba(58,28,113,0.7) 0%, rgba(215,109,119,0.7) 100%), 
+                        url('images/bg2.jpg'), url('https://picsum.photos/id/1043/1920/1080');
             background-size: cover;
             background-blend-mode: overlay;
         }
 
         .page-3 {
-            background: linear-gradient(135deg, rgba(31,64,55,0.85) 0%, rgba(153,242,200,0.85) 100%), 
-                        url('https://picsum.photos/id/1039/1920/1080');
+            background: linear-gradient(135deg, rgba(31,64,55,0.7) 0%, rgba(153,242,200,0.7) 100%), 
+                        url('images/bg3.jpg'), url('https://picsum.photos/id/1039/1920/1080');
             background-size: cover;
             background-blend-mode: overlay;
         }
@@ -97,84 +96,103 @@
             text-align: center;
             color: #ffffff;
             text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            padding: 0 20px;
         }
 
         .hero-title h1 {
-            font-size: 3rem;
+            font-size: 2.2rem;
             font-weight: 600;
             margin-bottom: 12px;
         }
 
         .hero-title p {
-            font-size: 1.2rem;
+            font-size: 1rem;
             opacity: 0.9;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
 
-        /* ================= 右侧折叠/展开侧边栏 (MiUIX 模糊风) ================= */
+        /* ================= 右上角悬浮胶囊侧边栏 (MiUIX 小窗设计) ================= */
         .sidebar {
             position: fixed;
-            right: 0;
-            top: 0;
-            height: 100vh;
-            width: 300px;
+            top: 20px;
+            right: 20px;
             z-index: 200;
+            
+            /* 收起状态：右上角小胶囊按钮 */
+            width: 95px;
+            height: 40px;
+            border-radius: 20px;
+            padding: 0 14px;
+            
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: var(--blur-glass);
             -webkit-backdrop-filter: var(--blur-glass);
-            border-left: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
             
-            /* 默认大部分收起在屏幕右侧 */
-            transform: translateX(240px);
-            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             flex-direction: column;
-            padding: 40px 20px;
         }
 
-        /* 鼠标移入侧边栏范围时平滑向左展开 */
+        /* 鼠标悬停 / 手机点击时：展开成功能面板 */
         .sidebar:hover {
-            transform: translateX(0);
+            width: 280px;
+            height: auto;
+            max-height: 80vh;
+            border-radius: var(--miui-radius-lg);
+            padding: 18px 18px 22px 18px;
+            background: rgba(255, 255, 255, 0.92);
         }
 
-        /* 侧边栏未展开时的提示按件 */
+        /* 胶囊顶部栏 / 指示标记 */
         .sidebar-handle {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
+            height: 40px;
+            min-height: 40px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: space-between;
             cursor: pointer;
         }
 
-        .sidebar-indicator {
-            width: 4px;
-            height: 36px;
-            background: var(--accent-blue);
-            border-radius: 4px;
-        }
-
-        .sidebar:hover .sidebar-handle {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .sidebar-title {
-            font-size: 1.2rem;
+        .sidebar-handle .handle-title {
+            font-size: 0.95rem;
             font-weight: 700;
             color: #1d1d1f;
-            margin-bottom: 25px;
-            padding-left: 10px;
-            border-left: 4px solid var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .sidebar-handle .handle-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(0, 102, 255, 0.6);
+        }
+
+        /* 展开内容容器 */
+        .sidebar-content {
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease 0.1s, transform 0.3s ease 0.1s;
+            pointer-events: none;
+            margin-top: 10px;
+        }
+
+        .sidebar:hover .sidebar-content {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
         }
 
         .menu-list {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
         }
 
         /* ================= 独创“预测性点击”按钮 ================= */
@@ -183,15 +201,15 @@
             background: rgba(255, 255, 255, 0.9);
             border: 1px solid rgba(0, 0, 0, 0.08);
             border-radius: var(--miui-radius-sm);
-            padding: 16px;
+            padding: 14px;
             cursor: pointer;
             transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
             overflow: hidden;
         }
 
         .predictive-btn .btn-title {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
             color: #1d1d1f;
             display: flex;
@@ -201,131 +219,4 @@
 
         .predictive-btn .btn-preview {
             max-height: 0;
-            opacity: 0;
-            font-size: 0.85rem;
-            color: #666666;
-            transition: all 0.3s ease;
-            line-height: 1.4;
-        }
-
-        /* --- 按住 (Holding) 触发放大窗口 --- */
-        .predictive-btn.holding {
-            transform: scale(1.06);
-            background: #ffffff;
-            border-color: var(--accent-blue);
-            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.25);
-            z-index: 10;
-        }
-
-        .predictive-btn.holding .btn-title {
-            color: var(--accent-blue);
-        }
-
-        .predictive-btn.holding .btn-preview {
-            max-height: 80px;
-            opacity: 1;
-            margin-top: 8px;
-        }
-    </style>
-</head>
-<body>
-
-    <header class="top-header">
-        <div class="logo">Sturgeon</div>
-    </header>
-
-    <aside class="sidebar">
-        <div class="sidebar-handle">
-            <div class="sidebar-indicator"></div>
-        </div>
-
-        <div class="sidebar-title">功能导航</div>
-        
-        <div class="menu-list">
-            <div class="predictive-btn" data-href="mbti.html">
-                <div class="btn-title">🧠 MBTI 测试 <span>→</span></div>
-                <div class="btn-preview">探索你的性格类型与内在潜能，提供多维度解析。</div>
-            </div>
-
-            <div class="predictive-btn" data-href="f1.html">
-                <div class="btn-title">🏎️ F1 赛历 <span>→</span></div>
-                <div class="btn-preview">实时查阅本赛季一级方程式赛车各分站时间与地点。</div>
-            </div>
-
-            <div class="predictive-btn" data-href="movies.html">
-                <div class="btn-title">🎬 观影记录 <span>→</span></div>
-                <div class="btn-preview">记录我看过的影视作品，包含评分与个人独家短评。</div>
-            </div>
-        </div>
-    </aside>
-
-    <main class="scroll-container">
-        <section class="page page-1">
-            <div class="hero-title">
-                <h1>这是 Sturgeon 的网站主页</h1>
-                <p>向下滑动探索更多功能 | 鼠标移至右侧展开导航</p>
-            </div>
-        </section>
-
-        <section class="page page-2">
-            <div class="hero-title">
-                <h1>极简 · 灵动 · 沉浸</h1>
-                <p>莫奈调色与 HyperOS 质感的融合</p>
-            </div>
-        </section>
-
-        <section class="page page-3">
-            <div class="hero-title">
-                <h1>热爱生活与探索</h1>
-                <p>速度、性格与光影的汇聚地</p>
-            </div>
-        </section>
-    </main>
-
-    <script>
-        document.querySelectorAll('.predictive-btn').forEach(btn => {
-            let isHolding = false;
-
-            btn.addEventListener('mousedown', () => {
-                isHolding = true;
-                btn.classList.add('holding');
-            });
-
-            btn.addEventListener('mouseup', () => {
-                if (isHolding) {
-                    isHolding = false;
-                    btn.classList.remove('holding');
-                    const targetUrl = btn.getAttribute('data-href');
-                    if (targetUrl) window.location.href = targetUrl;
-                }
-            });
-
-            btn.addEventListener('mouseleave', () => {
-                if (isHolding) {
-                    isHolding = false;
-                    btn.classList.remove('holding');
-                }
-            });
-
-            btn.addEventListener('touchstart', () => {
-                isHolding = true;
-                btn.classList.add('holding');
-            });
-
-            btn.addEventListener('touchend', () => {
-                if (isHolding) {
-                    isHolding = false;
-                    btn.classList.remove('holding');
-                    const targetUrl = btn.getAttribute('data-href');
-                    if (targetUrl) window.location.href = targetUrl;
-                }
-            });
-
-            btn.addEventListener('touchcancel', () => {
-                isHolding = false;
-                btn.classList.remove('holding');
-            });
-        });
-    </script>
-</body>
-</html>
+            opacity: 0
