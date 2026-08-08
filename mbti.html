@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HATS人格测试</title>
+<style>
+body{font-family:Microsoft YaHei;background:#eef3ef;display:flex;justify-content:center;padding:20px}
+.card{width:420px;background:#fff;border-radius:18px;padding:22px;box-shadow:0 8px 25px rgba(0,0,0,.08)}
+h1{text-align:center;color:#2f5d45}
+.option{border:1px solid #ddd;padding:12px;border-radius:10px;margin-top:10px;cursor:pointer}
+.option.sel{background:#dfeee4;border-color:#2f5d45}
+button{width:100%;padding:14px;background:#2f5d45;color:#fff;border:0;border-radius:12px;font-size:18px;margin-top:20px;cursor:pointer}
+.bar{height:8px;background:#e3e9e5;border-radius:8px;margin:15px 0;overflow:hidden}
+.bar div{height:100%;background:#2f5d45;width:0%}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#2f5d45;color:#fff;padding:10px 18px;border-radius:20px;opacity:0;transition:.4s}
+.geo{width:140px;height:140px;margin:10px auto;display:block}
+</style>
+</head>
+<body>
+<div class="toast" id="toast">已选择</div>
+<div class="card" id="app">
+<h1>SBTI已经过时，HATS来了。</h1>
+<p style="text-align:center">原作者：中华鲟</p>
+<div id="quiz"></div>
+</div>
+<script>
+const types=["叛徒","特务","大军阀","走资派","黑手","墙头草","老好人","逆流","小爬虫","变色龙","绊脚石"];
+const desc="你拥有极具戏剧性的个性与幽默精神，擅长在复杂环境中保持独特视角。本测试仅供娱乐。";
+const qs=[
+"我做决定很果断",
+"我认为中华鲟很美味",
+"我喜欢独立行动",
+"我认为人活着是为了去码头整点薯片",
+"我经常怀疑事情动机",
+"我喜欢掌控局面",
+"我更相信规则",
+"我对权威保持怀疑",
+"我更喜欢观察而不是参与",
+"世界本质很复杂"
+];
+let ans=[];
+function toast(){t.style.opacity=1;setTimeout(()=>t.style.opacity=0,900)}
+function render(){
+let html='<div class=bar><div id=p></div></div>';
+qs.forEach((q,i)=>{
+html+=`<b>Q${i+1} ${q}</b>
+<div class='option ${ans[i]==1?'sel':''}' onclick='sel(${i},1,this)'>不同意</div>
+<div class='option ${ans[i]==2?'sel':''}' onclick='sel(${i},2,this)'>中立</div>
+<div class='option ${ans[i]==3?'sel':''}' onclick='sel(${i},3,this)'>同意</div><br>`});
+html+='<button onclick=calc()>查看结果</button>';
+document.getElementById('quiz').innerHTML=html;
+prog();}
+function sel(i,v,e){ans[i]=v;render();toast()}
+function prog(){p.style.width=(ans.filter(Boolean).length/qs.length*100)+'%'}
+function calc(){if(ans.length<qs.length)return alert('请答完');
+let type=types[ans.reduce((a,b)=>a+b)%types.length];
+quiz.innerHTML=`<div class=result style='text-align:center'>
+<h2>你的HATS类型</h2><h1>${type}</h1>
+<svg class='geo' viewBox='0 0 200 200'>
+<circle cx='100' cy='100' r='70' fill='#dfeee4'/>
+<rect x='60' y='60' width='80' height='80' fill='#2f5d45' opacity='0.8'/>
+<polygon points='100,30 170,150 30,150' fill='#88b09a' opacity='0.9'/>
+</svg>
+<p>${desc}</p>
+<p>你可能具备以下特质：</p>
+<p>• 善于在复杂环境中寻找自己的位置<br>
+• 对群体与规则保持独立思考<br>
+• 兼具幽默感与观察力<br>
+• 在关键时刻展现出强烈个人风格</p>
+<p style='font-size:13px;color:#666'>本测试为娱乐向人格分类，请轻松看待结果。</p>
+<button onclick=location.reload()>重新测试</button></div>`}
+render();
+</script>
+</body>
+</html>

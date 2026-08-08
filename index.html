@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的个人功能站</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f6f8; color: #333; line-height: 1.6; }
+        .container { max-width: 900px; margin: 50px auto; padding: 0 20px; }
+        header { text-align: center; margin-bottom: 40px; }
+        header h1 { font-size: 2.5rem; color: #1a1a1a; margin-bottom: 10px; }
+        header p { color: #666; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 12px; padding: 25px; text-decoration: none; color: inherit; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+        .card h2 { font-size: 1.4rem; margin-bottom: 10px; color: #0070f3; }
+        .card p { font-size: 0.95rem; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 欢迎来到我的个人站</h1>
+            <p>挑选下方的小工具或功能板块开始使用吧！</p>
+        </header>
+
+        <main class="grid">
+            <a href="mbti.html" class="card">
+                <h2>🧠 MBTI 性格测试</h2>
+                <p>探索你的性格类型与内在潜能。</p>
+            </a>
+
+            <a href="f1.html" class="card">
+                <h2>🏎️ F1 赛历与日程</h2>
+                <p>查阅本赛季一级方程式赛车最新比赛日程。</p>
+            </a>
+
+            <a href="movies.html" class="card">
+                <h2>🎬 观影记录表</h2>
+                <p>记录我看过的所有电影、电视剧与观后评价。</p>
+            </a>
+        </main>
+    </div>
+</body>
+</html>
