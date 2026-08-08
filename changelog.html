@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sturgeon - 开发日志</title>
+    <style>
+        :root {
+            --liquid-glass-filter: blur(8px) saturate(170%) contrast(105%);
+            --miui-radius-lg: 24px;
+            --miui-radius-sm: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "MiSans", sans-serif;
+            background: #0f1015;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        /* 统一的折射玻璃面板 */
+        .glass-card {
+            width: 100%;
+            max-width: 650px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: var(--liquid-glass-filter);
+            -webkit-backdrop-filter: var(--liquid-glass-filter);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: var(--miui-radius-lg);
+            padding: 30px 24px;
+            box-shadow: 
+                inset 1.5px 1.5px 0px 0px rgba(255, 255, 255, 0.6),
+                0 12px 32px rgba(0, 0, 0, 0.35);
+        }
+
+        /* 顶部返回导航 */
+        .header-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .back-btn {
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+
+        .page-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* 时间线样式 */
+        .timeline {
+            position: relative;
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 4px;
+            top: 6px;
+            bottom: 6px;
+            width: 2px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -20px;
+            top: 4px;
+            width: 10px;
+            height: 10px;
+            background: #0066ff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #0066ff;
+        }
+
+        .version-tag {
+            display: inline-block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            background: rgba(0, 102, 255, 0.3);
+            color: #66a3ff;
+            padding: 2px 8px;
+            border-radius: 6px;
+            margin-right: 8px;
+        }
+
+        .version-date {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .log-list {
+            margin-top: 8px;
+            padding-left: 18px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.6;
+        }
+
+        .log-list li {
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glass-card">
+        <div class="header-nav">
+            <a href="index.html" class="back-btn">← 返回主页</a>
+            <h1 class="page-title">📝 开发日志</h1>
+        </div>
+
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div>
+                    <span class="version-tag">v1.2.0</span>
+                    <span class="version-date">最新更新</span>
+                </div>
+                <ul class="log-list">
+                    <li>左上角 Sturgeon 新增折射玻璃下拉菜单。</li>
+                    <li>新增开发日志与项目源码链接入口。</li>
+                    <li>升级右上角菜单为 iOS 晶莹折射玻璃光感。</li>
+                </ul>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot" style="background: rgba(255,255,255,0.4); box-shadow: none;"></div>
+                <div>
+                    <span class="version-tag" style="background: rgba(255,255,255,0.1); color: #ccc;">v1.1.0</span>
+                    <span class="version-date">历史更新</span>
+                </div>
+                <ul class="log-list">
+                    <li>适配移动端，侧边栏改为右上角悬浮胶囊形态。</li>
+                    <li>新增预测性长按 preview 交互。</li>
+                </ul>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot" style="background: rgba(255,255,255,0.4); box-shadow: none;"></div>
+                <div>
+                    <span class="version-tag" style="background: rgba(255,255,255,0.1); color: #ccc;">v1.0.0</span>
+                    <span class="version-date">首发发布</span>
+                </div>
+                <ul class="log-list">
+                    <li>个人主页首个版本上线 Cloudflare Pages。</li>
+                    <li>支持全屏滑动与本地背景图片配置。</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
