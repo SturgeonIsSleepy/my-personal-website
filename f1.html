@@ -3,46 +3,873 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>F1 赛季赛历</title>
+    <title>F1 2026 赛季赛历 - Sturgeon</title>
     <style>
-        body { font-family: sans-serif; background: #121212; color: #fff; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        a.back-btn { color: #e10600; text-decoration: none; font-size: 0.9rem; }
-        h1 { margin: 20px 0; border-bottom: 2px solid #e10600; padding-bottom: 10px; }
-        .race-card { background: #1e1e1e; border-left: 4px solid #e10600; margin-bottom: 15px; padding: 15px 20px; border-radius: 0 8px 8px 0; display: flex; justify-content: space-between; align-items: center; }
-        .race-info h3 { margin-bottom: 5px; }
-        .race-info p { color: #aaa; font-size: 0.9rem; }
-        .race-date { font-weight: bold; color: #e10600; background: rgba(225, 6, 0, 0.1); padding: 6px 12px; border-radius: 20px; }
+        :root {
+            --glass-tint-blue: rgba(0, 122, 255, 0.15);
+            --glass-accent-red: rgba(225, 6, 0, 0.35);
+            --miui-radius-lg: 24px;
+            --miui-radius-sm: 16px;
+            --mx: 50%;
+            --my: 30%;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "MiSans", sans-serif;
+            color: #ffffff;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            background-color: #0b0c10;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: -20px;
+            background: url('https://static01.nyt.com/images/2026/03/02/multimedia/02sp-preview-year-inyt-vhzq/02sp-preview-year-inyt-vhzq-mediumSquareAt3X.jpg') center/cover no-repeat;
+            filter: blur(12px) brightness(0.38) saturate(120%);
+            transform: scale(1.05);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .glass-card {
+            position: relative;
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: var(--miui-radius-sm);
+            box-shadow: 
+                inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.6),
+                inset 0 -1.5px 3px 0 rgba(0, 0, 0, 0.3),
+                0 12px 30px rgba(0, 0, 0, 0.4);
+            transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                        background 0.3s ease, 
+                        box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: radial-gradient(
+                350px circle at var(--mx) var(--my), 
+                rgba(255, 255, 255, 0.2), 
+                transparent 70%
+            );
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .glass-card:hover::before {
+            opacity: 1;
+        }
+
+        .interactive-btn {
+            cursor: pointer;
+            transition: transform 0.12s cubic-bezier(0.2, 0.9, 0.3, 1);
+        }
+
+        .interactive-btn:active {
+            transform: scale(0.97) !important;
+        }
+
+        header {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            padding: 8px 16px;
+            font-size: 0.88rem;
+            color: #ffffff;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            border-radius: 20px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .page-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .page-title span {
+            color: #e10600;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .standings-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            width: 100%;
+        }
+
+        .standings-card {
+            padding: 16px;
+            border-radius: var(--miui-radius-sm);
+            background: rgba(0, 0, 0, 0.35);
+        }
+
+        .standings-title {
+            font-size: 0.9rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            padding-bottom: 8px;
+        }
+
+        .standings-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .standing-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.84rem;
+            padding: 4px 6px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .standing-rank-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .standing-pts {
+            font-weight: 700;
+            color: #ffd700;
+            font-size: 0.82rem;
+        }
+
+        .accordion-section {
+            border-radius: var(--miui-radius-sm);
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            padding: 14px 20px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .accordion-header:hover {
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        .accordion-arrow {
+            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .accordion-section.open .accordion-arrow {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.45s cubic-bezier(0, 1, 0, 1), padding 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 0 10px;
+        }
+
+        .accordion-section.open .accordion-content {
+            max-height: 4000px;
+            padding: 10px 0;
+        }
+
+        .race-item-wrapper {
+            border-radius: var(--miui-radius-sm);
+            overflow: hidden;
+        }
+
+        .race-card-mini {
+            padding: 14px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.92rem;
+        }
+
+        .race-card-mini:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .race-item-wrapper.past .race-card-mini {
+            opacity: 0.65;
+        }
+
+        .race-mini-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .race-mini-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .race-mini-round {
+            font-weight: 800;
+            opacity: 0.6;
+            font-size: 0.85rem;
+            width: 32px;
+        }
+
+        .item-arrow {
+            transition: transform 0.3s ease;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .race-item-wrapper.expanded .item-arrow {
+            transform: rotate(180deg);
+        }
+
+        .race-card-detail {
+            display: none;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.35);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .race-item-wrapper.expanded .race-card-detail {
+            display: block;
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-next-card {
+            border-radius: var(--miui-radius-lg);
+            border-color: rgba(255, 60, 60, 0.65);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, var(--glass-accent-red) 100%);
+            padding: 24px;
+            box-shadow: 
+                inset 0 2px 2px 0 rgba(255, 255, 255, 0.9),
+                0 12px 35px rgba(225, 6, 0, 0.35);
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #e10600;
+            color: #ffffff;
+            font-size: 0.78rem;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-header-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .hero-title-cn {
+            font-size: 1.8rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+
+        .hero-title-en {
+            font-size: 0.95rem;
+            opacity: 0.75;
+        }
+
+        .hero-location {
+            font-size: 0.92rem;
+            margin-top: 6px;
+            color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .winner-box {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .winner-box .winner-name {
+            font-weight: 700;
+            color: #ffd700;
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .schedule-item {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 10px 12px;
+            border-radius: 12px;
+        }
+
+        .schedule-item.main-event {
+            background: rgba(225, 6, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .schedule-name {
+            font-size: 0.78rem;
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+
+        .schedule-time {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 40px;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .standings-wrapper {
+                grid-template-columns: 1fr;
+            }
+            .hero-header-info {
+                flex-direction: column;
+            }
+            .winner-box {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <a href="index.html" class="back-btn">← 返回主页</a>
-        <h1>🏎️ 赛季 F1 大奖赛赛历</h1>
 
-        <div class="race-card">
-            <div class="race-info">
-                <h3>巴林大奖赛 (Bahrain GP)</h3>
-                <p>萨基尔赛道 · Sakhir</p>
+    <header>
+        <a href="index.html" class="back-btn glass-card interactive-btn">← 返回主页</a>
+        <h1 class="page-title"><span>F1</span> 2026 赛历</h1>
+    </header>
+
+    <main class="main-container" id="mainContainer">
+        <div class="standings-wrapper">
+            <div class="standings-card glass-card">
+                <div class="standings-title">🏆 车手积分榜 TOP 3</div>
+                <div class="standings-list" id="driverStandingsList">
+                    <div style="font-size:0.8rem; opacity:0.7;">⏳ 正在读取...</div>
+                </div>
             </div>
-            <div class="race-date">03.02 - 03.04</div>
+            <div class="standings-card glass-card">
+                <div class="standings-title">🏎️ 车队积分榜 TOP 3</div>
+                <div class="standings-list" id="constructorStandingsList">
+                    <div style="font-size:0.8rem; opacity:0.7;">⏳ 正在读取...</div>
+                </div>
+            </div>
         </div>
 
-        <div class="race-card">
-            <div class="race-info">
-                <h3>沙特阿美大奖赛 (Saudi Arabian GP)</h3>
-                <p>吉达滨海赛道 · Jeddah</p>
-            </div>
-            <div class="race-date">03.09 - 03.11</div>
+        <div class="loading-state glass-card">
+            ⚡ 正在深度解析 2026 赛历与多维度历史大奖赛冠军数据...
         </div>
+    </main>
 
-        <div class="race-card">
-            <div class="race-info">
-                <h3>中国大奖赛 (Chinese GP)</h3>
-                <p>上海国际赛车场 · Shanghai</p>
-            </div>
-            <div class="race-date">04.19 - 04.21</div>
-        </div>
-    </div>
+    <script>
+        const cnDict = {
+            "Australian Grand Prix": { name: "澳大利亚大奖赛", city: "墨尔本 · 阿尔伯特公园赛道" },
+            "Chinese Grand Prix": { name: "中国大奖赛", city: "上海 · 上海国际赛车场" },
+            "Japanese Grand Prix": { name: "日本大奖赛", city: "铃鹿 · 铃鹿赛道" },
+            "Bahrain Grand Prix": { name: "巴林大奖赛", city: "萨基尔 · 巴林国际赛道" },
+            "Saudi Arabian Grand Prix": { name: "沙特阿拉伯大奖赛", city: "吉达 · 吉达滨海赛道" },
+            "Miami Grand Prix": { name: "迈阿密大奖赛", city: "迈阿密 · 迈阿密国际赛道" },
+            "Emilia Romagna Grand Prix": { name: "伊莫拉大奖赛", city: "伊莫拉 · 恩佐与迪诺·法拉利赛道" },
+            "Monaco Grand Prix": { name: "摩纳哥大奖赛", city: "蒙特卡洛 · 摩纳哥赛道" },
+            "Canadian Grand Prix": { name: "加拿大大奖赛", city: "蒙特利尔 · 吉尔·维伦纽夫赛道" },
+            "Spanish Grand Prix": { name: "西班牙大奖赛", city: "巴塞罗那 · 加泰罗尼亚赛道" },
+            "Austrian Grand Prix": { name: "奥地利大奖赛", city: "施皮尔贝格 · 红牛环赛道" },
+            "British Grand Prix": { name: "英国大奖赛", city: "银石 · 银石赛道" },
+            "Hungarian Grand Prix": { name: "匈牙利大奖赛", city: "布达佩斯 · 匈牙利环赛道" },
+            "Belgian Grand Prix": { name: "比利时大奖赛", city: "斯帕 · 斯帕-弗朗科尔尚赛道" },
+            "Dutch Grand Prix": { name: "荷兰大奖赛", city: "赞德福特 · 赞德福特赛道" },
+            "Italian Grand Prix": { name: "意大利大奖赛", city: "蒙扎 · 蒙扎国家赛车场" },
+            "Azerbaijan Grand Prix": { name: "阿塞拜疆大奖赛", city: "巴库 · 巴库市街赛道" },
+            "Singapore Grand Prix": { name: "新加坡大奖赛", city: "新加坡 · 滨海湾市街赛道" },
+            "United States Grand Prix": { name: "美国大奖赛", city: "奥斯汀 · 美洲赛道" },
+            "Mexico City Grand Prix": { name: "墨西哥城大奖赛", city: "墨西哥城 · 罗德里格斯兄弟赛车场" },
+            "Sao Paulo Grand Prix": { name: "圣保罗大奖赛", city: "圣保罗 · 英特拉格斯赛道" },
+            "Las Vegas Grand Prix": { name: "拉斯维加斯大奖赛", city: "拉斯维加斯 · 拉斯维加斯市街赛道" },
+            "Qatar Grand Prix": { name: "卡塔尔大奖赛", city: "罗塞尔 · 罗塞尔国际赛道" },
+            "Abu Dhabi Grand Prix": { name: "阿布扎比大奖赛", city: "阿布扎比 · 亚斯码头赛道" },
+            "Madrid Grand Prix": { name: "马德里大奖赛", city: "马德里 · 内部集市赛道" }
+        };
+
+        const driverCnDict = {
+            "Max Verstappen": "维斯塔潘",
+            "Lando Norris": "诺里斯",
+            "Charles Leclerc": "勒克莱尔",
+            "Oscar Piastri": "皮亚斯特里",
+            "Carlos Sainz": "塞恩斯",
+            "George Russell": "拉塞尔",
+            "Lewis Hamilton": "汉密尔顿",
+            "Sergio Pérez": "佩雷兹",
+            "Sergio Perez": "佩雷兹",
+            "Fernando Alonso": "阿隆索",
+            "Pierre Gasly": "加斯利",
+            "Esteban Ocon": "奥康",
+            "Nico Hülkenberg": "霍肯伯格",
+            "Nico Hulkenberg": "霍肯伯格",
+            "Yuki Tsunoda": "角田裕毅",
+            "Lance Stroll": "斯特罗尔",
+            "Alexander Albon": "阿尔本",
+            "Zhou Guanyu": "周冠宇",
+            "Oliver Bearman": "贝尔曼",
+            "Liam Lawson": "劳森",
+            "Andrea Kimi Antonelli": "安东内利",
+            "Jack Doohan": "杜汉",
+            "Gabriel Bortoleto": "博托莱托",
+            "Isack Hadjar": "哈贾尔",
+            "Franco Colapinto": "科拉平托"
+        };
+
+        const teamCnDict = {
+            "McLaren": "迈凯伦",
+            "Ferrari": "法拉利",
+            "Red Bull Racing": "红牛",
+            "Red Bull": "红牛",
+            "Mercedes": "梅赛德斯",
+            "Aston Martin": "阿斯顿·马丁",
+            "Alpine": "阿尔派",
+            "Haas F1 Team": "哈斯",
+            "Haas": "哈斯",
+            "RB": "RB (小红牛)",
+            "Racing Bulls": "RB (小红牛)",
+            "Williams": "威廉姆斯",
+            "Sauber": "索伯",
+            "Kick Sauber": "索伯"
+        };
+
+        const dynamicWinnersMap = {};
+
+        function getRaceInfo(race) {
+            if (!race) return { name: "未知大奖赛", city: "未知赛道" };
+            const rawName = race.raceName || "";
+            const rawCircuit = race.Circuit ? race.Circuit.circuitName : "";
+
+            if (cnDict[rawName]) return cnDict[rawName];
+
+            for (const key in cnDict) {
+                if (rawName.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(rawName.toLowerCase())) {
+                    return cnDict[key];
+                }
+            }
+
+            let translatedName = rawName.replace("Grand Prix", "大奖赛").replace("GP", "大奖赛");
+            return { name: translatedName, city: rawCircuit || "赛道信息" };
+        }
+
+        function toBeijingTime(dateStr, timeStr) {
+            if (!dateStr) return '待定';
+            const fullStr = timeStr ? `${dateStr}T${timeStr}` : `${dateStr}T12:00:00Z`;
+            const date = new Date(fullStr);
+            return date.toLocaleString('zh-CN', {
+                timeZone: 'Asia/Shanghai',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            }).replace(/\//g, '-');
+        }
+
+        function buildScheduleGridHTML(race) {
+            let html = '';
+            if (race.FirstPractice) html += `<div class="schedule-item"><div class="schedule-name">一练 (FP1)</div><div class="schedule-time">${toBeijingTime(race.FirstPractice.date, race.FirstPractice.time)}</div></div>`;
+            if (race.SprintQualifying) html += `<div class="schedule-item"><div class="schedule-name">冲刺排位赛</div><div class="schedule-time">${toBeijingTime(race.SprintQualifying.date, race.SprintQualifying.time)}</div></div>`;
+            if (race.SecondPractice) html += `<div class="schedule-item"><div class="schedule-name">二练 (FP2)</div><div class="schedule-time">${toBeijingTime(race.SecondPractice.date, race.SecondPractice.time)}</div></div>`;
+            if (race.Sprint) html += `<div class="schedule-item"><div class="schedule-name">冲刺赛</div><div class="schedule-time">${toBeijingTime(race.Sprint.date, race.Sprint.time)}</div></div>`;
+            if (race.ThirdPractice) html += `<div class="schedule-item"><div class="schedule-name">三练 (FP3)</div><div class="schedule-time">${toBeijingTime(race.ThirdPractice.date, race.ThirdPractice.time)}</div></div>`;
+            if (race.Qualifying) html += `<div class="schedule-item"><div class="schedule-name">排位赛</div><div class="schedule-time">${toBeijingTime(race.Qualifying.date, race.Qualifying.time)}</div></div>`;
+            html += `<div class="schedule-item main-event"><div class="schedule-name">🏎️ 正赛 (Race)</div><div class="schedule-time">${toBeijingTime(race.date, race.time)}</div></div>`;
+            return html;
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            document.querySelectorAll('.glass-card').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                el.style.setProperty('--mx', `${e.clientX - rect.left}px`);
+                el.style.setProperty('--my', `${e.clientY - rect.top}px`);
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.race-item-wrapper')) {
+                document.querySelectorAll('.race-item-wrapper.expanded').forEach(item => item.classList.remove('expanded'));
+            }
+            if (!e.target.closest('.accordion-section')) {
+                document.querySelectorAll('.accordion-section.open').forEach(sec => sec.classList.remove('open'));
+            }
+        });
+
+        function renderStandings(driverData, constructorData) {
+            const driverContainer = document.getElementById('driverStandingsList');
+            const constructorContainer = document.getElementById('constructorStandingsList');
+            const badges = ['🥇', '🥈', '🥉'];
+
+            try {
+                const list = driverData?.MRData?.StandingsTable?.StandingsLists[0]?.DriverStandings?.slice(0, 3) || [];
+                if (list.length > 0) {
+                    driverContainer.innerHTML = list.map((item, idx) => {
+                        const fullName = `${item.Driver.givenName} ${item.Driver.familyName}`;
+                        return `
+                            <div class="standing-item">
+                                <div class="standing-rank-name"><span>${badges[idx]}</span><span>${driverCnDict[fullName] || fullName}</span></div>
+                                <span class="standing-pts">${item.points} PTS</span>
+                            </div>`;
+                    }).join('');
+                } else throw new Error();
+            } catch (e) {
+                driverContainer.innerHTML = `
+                    <div class="standing-item"><div class="standing-rank-name">🥇 1. 诺里斯</div><span class="standing-pts">0 PTS</span></div>
+                    <div class="standing-item"><div class="standing-rank-name">🥈 2. 维斯塔潘</div><span class="standing-pts">0 PTS</span></div>
+                    <div class="standing-item"><div class="standing-rank-name">🥉 3. 勒克莱尔</div><span class="standing-pts">0 PTS</span></div>`;
+            }
+
+            try {
+                const list = constructorData?.MRData?.StandingsTable?.StandingsLists[0]?.ConstructorStandings?.slice(0, 3) || [];
+                if (list.length > 0) {
+                    constructorContainer.innerHTML = list.map((item, idx) => `
+                        <div class="standing-item">
+                            <div class="standing-rank-name"><span>${badges[idx]}</span><span>${teamCnDict[item.Constructor.name] || item.Constructor.name}</span></div>
+                            <span class="standing-pts">${item.points} PTS</span>
+                        </div>`).join('');
+                } else throw new Error();
+            } catch (e) {
+                constructorContainer.innerHTML = `
+                    <div class="standing-item"><div class="standing-rank-name">🥇 1. 迈凯伦车队</div><span class="standing-pts">0 PTS</span></div>
+                    <div class="standing-item"><div class="standing-rank-name">🥈 2. 法拉利车队</div><span class="standing-pts">0 PTS</span></div>
+                    <div class="standing-item"><div class="standing-rank-name">🥉 3. 红牛车队</div><span class="standing-pts">0 PTS</span></div>`;
+            }
+        }
+
+        function getWinnerStr(circuitId, raceName) {
+            if (!circuitId) return "去年未举办";
+            
+            // 多重键值归一检查（兼容 catalyst/catalunya/bahrain 等）
+            const cleanId = circuitId.toLowerCase();
+            for (const key in dynamicWinnersMap) {
+                if (cleanId.includes(key) || key.includes(cleanId)) {
+                    return dynamicWinnersMap[key];
+                }
+            }
+
+            // 根据大奖赛名称模糊匹配兜底
+            if (raceName) {
+                const rLower = raceName.toLowerCase();
+                for (const key in dynamicWinnersMap) {
+                    if (rLower.includes(key)) return dynamicWinnersMap[key];
+                }
+            }
+
+            return "去年未举办";
+        }
+
+        async function loadAllF1Data() {
+            const container = document.getElementById('mainContainer');
+            const currentSeason = "2026";
+            const prevSeason = "2025";
+
+            // 1. 同时并发调取核心接口
+            const [calendarRes, driversRes, constructorsRes, prevResultsRes] = await Promise.allSettled([
+                fetch(`https://api.jolpi.ca/ergast/f1/${currentSeason}.json`),
+                fetch(`https://api.jolpi.ca/ergast/f1/${currentSeason}/driverstandings.json`),
+                fetch(`https://api.jolpi.ca/ergast/f1/${currentSeason}/constructorstandings.json`),
+                fetch(`https://api.jolpi.ca/ergast/f1/${prevSeason}/results/1.json`)
+            ]);
+
+            // 解析 2025 全赛季首名成绩
+            if (prevResultsRes.status === 'fulfilled' && prevResultsRes.value.ok) {
+                try {
+                    const prevData = await prevResultsRes.value.json();
+                    const races = prevData.MRData?.RaceTable?.Races || [];
+                    races.forEach(r => {
+                        const cId = r.Circuit?.circuitId;
+                        const rName = (r.raceName || "").toLowerCase();
+                        if (r.Results?.[0]?.Driver) {
+                            const d = r.Results[0].Driver;
+                            const fullName = `${d.givenName} ${d.familyName}`;
+                            const val = `${driverCnDict[fullName] || fullName} (${prevSeason})`;
+                            if (cId) dynamicWinnersMap[cId.toLowerCase()] = val;
+                            if (rName.includes("bahrain")) dynamicWinnersMap["bahrain"] = val;
+                            if (rName.includes("spanish") || rName.includes("catalunya")) {
+                                dynamicWinnersMap["catalunya"] = val;
+                                dynamicWinnersMap["barcelona"] = val;
+                            }
+                        }
+                    });
+                } catch (e) {}
+            }
+
+            // 补充检查：针对巴林与西班牙进行专项单站 API 查询（确保万无一失）
+            try {
+                const [bahrainCheck, spainCheck] = await Promise.allSettled([
+                    fetch(`https://api.jolpi.ca/ergast/f1/${prevSeason}/circuits/bahrain/results/1.json`),
+                    fetch(`https://api.jolpi.ca/ergast/f1/${prevSeason}/circuits/catalunya/results/1.json`)
+                ]);
+                
+                if (bahrainCheck.status === 'fulfilled' && bahrainCheck.value.ok) {
+                    const bData = await bahrainCheck.value.json();
+                    const d = bData.MRData?.RaceTable?.Races?.[0]?.Results?.[0]?.Driver;
+                    if (d) {
+                        const name = `${d.givenName} ${d.familyName}`;
+                        dynamicWinnersMap["bahrain"] = `${driverCnDict[name] || name} (${prevSeason})`;
+                    }
+                }
+                if (spainCheck.status === 'fulfilled' && spainCheck.value.ok) {
+                    const sData = await spainCheck.value.json();
+                    const d = sData.MRData?.RaceTable?.Races?.[0]?.Results?.[0]?.Driver;
+                    if (d) {
+                        const name = `${d.givenName} ${d.familyName}`;
+                        dynamicWinnersMap["catalunya"] = `${driverCnDict[name] || name} (${prevSeason})`;
+                    }
+                }
+            } catch (err) {}
+
+            // 积分榜渲染
+            let driverData = null;
+            let constructorData = null;
+            if (driversRes.status === 'fulfilled' && driversRes.value.ok) driverData = await driversRes.value.json();
+            if (constructorsRes.status === 'fulfilled' && constructorsRes.value.ok) constructorData = await constructorsRes.value.json();
+            renderStandings(driverData, constructorData);
+
+            // 赛历获取
+            let races = [];
+            if (calendarRes.status === 'fulfilled' && calendarRes.value.ok) {
+                try {
+                    const calData = await calendarRes.value.json();
+                    races = calData.MRData?.RaceTable?.Races || [];
+                } catch (e) {}
+            }
+
+            if (races.length === 0) {
+                races = [
+                    { round: "1", raceName: "Australian Grand Prix", date: "2026-03-08", time: "04:00:00Z", Circuit: { circuitId: "albert_park", circuitName: "Albert Park Circuit" } },
+                    { round: "2", raceName: "Chinese Grand Prix", date: "2026-03-22", time: "07:00:00Z", Circuit: { circuitId: "shanghai", circuitName: "Shanghai International Circuit" } }
+                ];
+            }
+
+            const loadingState = container.querySelector('.loading-state');
+            if (loadingState) loadingState.remove();
+
+            const today = new Date();
+            let pastRaces = [];
+            let nextRace = null;
+            let futureRaces = [];
+
+            races.forEach(race => {
+                const raceDate = new Date(`${race.date}T${race.time || '23:59:59Z'}`);
+                if (raceDate < today && (today - raceDate > 86400000)) {
+                    pastRaces.push(race);
+                } else if (!nextRace) {
+                    nextRace = race;
+                } else {
+                    futureRaces.push(race);
+                }
+            });
+
+            if (!nextRace && races.length > 0) nextRace = races[races.length - 1];
+
+            if (pastRaces.length > 0) {
+                container.appendChild(createAccordion('已完成分站 (' + pastRaces.length + ' 场)', pastRaces, true));
+            }
+
+            if (nextRace) {
+                container.appendChild(createNextRaceHero(nextRace));
+            }
+
+            if (futureRaces.length > 0) {
+                container.appendChild(createAccordion('后续分站赛历 (' + futureRaces.length + ' 场)', futureRaces, false));
+            }
+        }
+
+        function createAccordion(title, raceList, isPast) {
+            const section = document.createElement('div');
+            section.className = 'accordion-section glass-card';
+
+            const header = document.createElement('div');
+            header.className = 'accordion-header interactive-btn';
+            header.innerHTML = `
+                <span>${isPast ? '🏁' : '📅'} ${title}</span>
+                <span class="accordion-arrow">▾</span>
+            `;
+
+            const content = document.createElement('div');
+            content.className = 'accordion-content';
+
+            raceList.forEach(race => {
+                content.appendChild(createExpandableRaceItem(race, isPast));
+            });
+
+            header.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const wasOpen = section.classList.contains('open');
+                document.querySelectorAll('.accordion-section.open').forEach(s => s.classList.remove('open'));
+                if (!wasOpen) section.classList.add('open');
+            });
+
+            section.appendChild(header);
+            section.appendChild(content);
+            return section;
+        }
+
+        function createExpandableRaceItem(race, isPast) {
+            const info = getRaceInfo(race);
+            const circuitId = race.Circuit ? race.Circuit.circuitId : null;
+            const winnerText = getWinnerStr(circuitId, race.raceName);
+
+            const wrapper = document.createElement('div');
+            wrapper.className = `race-item-wrapper glass-card ${isPast ? 'past' : ''}`;
+
+            wrapper.innerHTML = `
+                <div class="race-card-mini interactive-btn">
+                    <div class="race-mini-left">
+                        <span class="race-mini-round">R${String(race.round).padStart(2, '0')}</span>
+                        <div>
+                            <div style="font-weight:700;">${info.name}</div>
+                            <div style="font-size:0.78rem; opacity:0.7;">${info.city}</div>
+                        </div>
+                    </div>
+                    <div class="race-mini-right">
+                        <span style="font-weight:600; font-size:0.85rem;">
+                            ${toBeijingTime(race.date, race.time).split(' ')[0]}
+                        </span>
+                        <span class="item-arrow">▾</span>
+                    </div>
+                </div>
+                <div class="race-card-detail">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+                        <span style="font-size:0.82rem; opacity:0.8;">📍 官方名称: ${race.raceName}</span>
+                        <span style="font-size:0.82rem; color:#ffd700;">🏆 上届冠军: ${winnerText}</span>
+                    </div>
+                    <div style="font-size:0.82rem; font-weight:700; margin-bottom:8px; opacity:0.9;">⏱️ 比赛时刻表（北京时间）</div>
+                    <div class="schedule-grid">
+                        ${buildScheduleGridHTML(race)}
+                    </div>
+                </div>
+            `;
+
+            const miniHeader = wrapper.querySelector('.race-card-mini');
+            miniHeader.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const wasExpanded = wrapper.classList.contains('expanded');
+                document.querySelectorAll('.race-item-wrapper.expanded').forEach(item => item.classList.remove('expanded'));
+                if (!wasExpanded) wrapper.classList.add('expanded');
+            });
+
+            return wrapper;
+        }
+
+        function createNextRaceHero(race) {
+            const card = document.createElement('div');
+            card.className = 'hero-next-card glass-card';
+
+            const info = getRaceInfo(race);
+            const circuitId = race.Circuit ? race.Circuit.circuitId : null;
+            const winnerText = getWinnerStr(circuitId, race.raceName);
+
+            card.innerHTML = `
+                <div class="hero-badge">🔥 下一站大奖赛 · ROUND ${race.round}</div>
+                <div class="hero-header-info">
+                    <div>
+                        <div class="hero-title-cn">${info.name}</div>
+                        <div class="hero-title-en">${race.raceName}</div>
+                        <div class="hero-location">📍 ${info.city}</div>
+                    </div>
+                    <div class="winner-box">
+                        <span>🏆 上届本站冠军:</span>
+                        <span class="winner-name">${winnerText}</span>
+                    </div>
+                </div>
+
+                <div style="font-size:0.85rem; font-weight:700; margin-top:12px; opacity:0.9;">⏱️ 比赛时刻表（北京时间）</div>
+                <div class="schedule-grid" style="margin-top:10px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.2);">
+                    ${buildScheduleGridHTML(race)}
+                </div>
+            `;
+
+            return card;
+        }
+
+        document.addEventListener('DOMContentLoaded', loadAllF1Data);
+    </script>
 </body>
 </html>
