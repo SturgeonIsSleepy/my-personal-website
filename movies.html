@@ -47,8 +47,8 @@
       background: linear-gradient(var(--bg-overlay), var(--bg-overlay)), 
                   url('https://truth.bahamut.com.tw/s01/202308/8b4c68abf876aad7ebe2e8c002fbad4b.JPG') no-repeat center center;
       background-size: cover;
-      filter: blur(10px); /* 背景略微模糊 */
-      transform: scale(1.05); /* 防止边缘白边 */
+      filter: blur(10px);
+      transform: scale(1.05);
       z-index: -1;
     }
 
@@ -112,6 +112,12 @@
       border-color: rgba(255, 255, 255, 0.6);
     }
 
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
     .btn-secondary {
       background: var(--glass-gradient);
       color: var(--text-main);
@@ -139,7 +145,7 @@
       padding: 0 15px;
     }
 
-    /* 选项卡栏 - 液态玻璃槽 */
+    /* 选项卡栏 */
     .tabs {
       display: flex;
       gap: 10px;
@@ -203,6 +209,9 @@
       font-weight: 700;
       color: #ffffff;
       text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .movie-meta {
@@ -276,12 +285,17 @@
       transition: all 0.25s ease;
     }
 
+    .modal-content select option {
+      background: #1e293b;
+      color: white;
+    }
+
     .modal-content input:focus, .modal-content textarea:focus, .modal-content select:focus {
       border-color: var(--primary);
       box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
     }
 
-    /* 悬浮 + 号添加按钮 - 流体悬浮球 */
+    /* 悬浮 + 号添加按钮 */
     .fab {
       position: fixed;
       bottom: 35px;
@@ -348,13 +362,20 @@
 
   <div class="modal" id="addModal">
     <div class="modal-content">
-      <h3>添加新影片</h3>
-      <input type="text" id="movieTitle" placeholder="影片名称">
+      <h3>添加新作品</h3>
+      <input type="text" id="movieTitle" placeholder="作品名称 (如: 星际穿越 / 鬼灭之刃 / 狂飙)">
+      
+      <select id="mediaCategory">
+        <option value="movie">🎬 电影</option>
+        <option value="tv">📺 剧集 / 电视剧</option>
+        <option value="anime">🎨 动漫 / 动画</option>
+      </select>
+
       <select id="movieType">
         <option value="watched">已观看</option>
         <option value="plan">计划看</option>
       </select>
-      <input type="number" id="movieRating" placeholder="评分 (1-10)" min="1" max="10">
+      <input type="number" id="movieRating" placeholder="个人评分 (1-10，选填)" min="1" max="10">
       <textarea id="movieDesc" placeholder="观影心得 / 备注" rows="3"></textarea>
       <button class="btn" onclick="submitAddMovie()">保存</button>
       <button class="btn btn-danger" onclick="closeModal('addModal')">取消</button>
@@ -427,6 +448,15 @@
       }
     }
 
+    // 根据分类获取图标
+    function getCategoryIcon(category) {
+      switch (category) {
+        case 'tv': return '📺';
+        case 'anime': return '🎨';
+        case 'movie': default: return '🎬';
+      }
+    }
+
     function renderMovies() {
       const grid = document.getElementById('movieGrid');
       grid.innerHTML = '';
@@ -445,6 +475,8 @@
         const card = document.createElement('div');
         card.className = 'movie-card';
 
+        const icon = getCategoryIcon(m.category || 'movie');
+
         let extHtml = '';
         if (m.type === 'plan' && m.external_rating) {
           extHtml = `
@@ -456,7 +488,7 @@
         }
 
         card.innerHTML = `
-          <div class="movie-title">${m.title}</div>
+          <div class="movie-title"><span>${icon}</span> ${m.title}</div>
           <div class="movie-meta">
             ${m.type === 'watched' ? '✅ 已观看' : '📌 计划看'} 
             ${m.rating ? `| <span class="rating">★ ${m.rating}/10</span>` : ''}
@@ -520,20 +552,29 @@
 
     async function submitAddMovie() {
       const title = document.getElementById('movieTitle').value.trim();
+      const category = document.getElementById('mediaCategory').value;
       const type = document.getElementById('movieType').value;
       const rating = parseFloat(document.getElementById('movieRating').value) || 0;
       const description = document.getElementById('movieDesc').value.trim();
 
-      if (!title) return alert('请输入影片名称');
+      if (!title) return alert('请输入作品名称');
+
+      const saveBtn = document.querySelector('#addModal .btn:not(.btn-danger)');
+      const originalText = saveBtn.innerText;
+      saveBtn.innerText = type === 'plan' ? '🔍 正在全网检索评分...' : '保存中...';
+      saveBtn.disabled = true;
 
       try {
-        await apiFetch('/movies', 'POST', { title, type, rating, description });
+        await apiFetch('/movies', 'POST', { title, category, type, rating, description });
         closeModal('addModal');
         document.getElementById('movieTitle').value = '';
         document.getElementById('movieDesc').value = '';
         fetchMovies();
       } catch (err) {
         alert(err.message);
+      } finally {
+        saveBtn.innerText = originalText;
+        saveBtn.disabled = false;
       }
     }
 
@@ -554,7 +595,7 @@
     }
 
     async function deleteMovie(id) {
-      if (!confirm('确定要删除这部影片记录吗？')) return;
+      if (!confirm('确定要删除这部作品记录吗？')) return;
       try {
         await apiFetch(`/movies/${id}`, 'DELETE');
         fetchMovies();
