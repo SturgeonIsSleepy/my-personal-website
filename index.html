@@ -7,31 +7,27 @@
     <style>
         /* ================= 莫奈取色与 MiUIX 全局变量 ================= */
         :root {
-            --accent-blue: #0066ff;             /* 强调色：小米/HyperOS 经典蓝 */
-            --accent-blue-light: #e5f0ff;       /* 柔和蓝 */
-            --monet-bg-1: #e2e8f0;              /* 莫奈风格低饱和背景色 */
-            --monet-text-main: #1d1d1f;         /* 主文字颜色 */
-            --monet-text-muted: #6e6e73;        /* 副文字颜色 */
-            --miui-radius-lg: 24px;             /* MiUIX 核心大圆角 */
+            --accent-blue: #0066ff;             /* 小米/HyperOS 经典蓝 */
+            --miui-radius-lg: 24px;             /* MiUIX 大圆角 */
             --miui-radius-sm: 14px;             /* 小圆角 */
-            --blur-glass: blur(25px) saturate(180%); /* 高斯模糊效果 */
+            --blur-glass: blur(20px) saturate(180%);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            user-select: none; /* 防止长按拖拽文本影响预测点击 */
+            user-select: none;
         }
 
         body, html {
             height: 100%;
             font-family: -apple-system, BlinkMacSystemFont, "MiSans", "PingFang SC", sans-serif;
-            color: var(--monet-text-main);
-            overflow: hidden; /* 由内部容器控制滚动 */
+            overflow: hidden;
+            background-color: #1a1b26; /* 兜底深色背景 */
         }
 
-        /* ================= 左上角 Logo 顶栏 ================= */
+        /* ================= 左上角 Logo 标识 ================= */
         .top-header {
             position: fixed;
             top: 20px;
@@ -42,17 +38,18 @@
         .logo {
             font-size: 1.5rem;
             font-weight: 700;
-            letter-spacing: 1px;
             color: #ffffff;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            background: rgba(255, 255, 255, 0.15);
+            letter-spacing: 1px;
+            background: rgba(0, 0, 0, 0.35);
             backdrop-filter: var(--blur-glass);
-            padding: 8px 20px;
+            -webkit-backdrop-filter: var(--blur-glass);
+            padding: 8px 24px;
             border-radius: var(--miui-radius-lg);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        /* ================= 全屏图片滚动 (一页一张图) ================= */
+        /* ================= 全屏图片/渐变滑动 (一页一张图) ================= */
         .scroll-container {
             height: 100vh;
             overflow-y: scroll;
@@ -65,34 +62,33 @@
             width: 100vw;
             scroll-snap-align: start;
             position: relative;
-            background-size: cover;
-            background-position: center;
             display: flex;
             align-items: center;
             justify-content: center;
+            background-size: cover;
+            background-position: center;
         }
 
-        /* 遮罩层：保证文字可读性，呈现莫奈式的柔和暗调 */
-        .page::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%);
-        }
-
-        /* 第一页（主页大标题）背景图片 */
+        /* 莫奈渐变 + 备用图（即使图片未加载，也有极美渐变色） */
         .page-1 {
-            background-image: url('https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=1920&q=80');
+            background: linear-gradient(135deg, rgba(43,50,178,0.85) 0%, rgba(20,136,204,0.85) 100%), 
+                        url('https://picsum.photos/id/1015/1920/1080');
+            background-size: cover;
+            background-blend-mode: overlay;
         }
 
-        /* 第二页背景图片 */
         .page-2 {
-            background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1920&q=80');
+            background: linear-gradient(135deg, rgba(58,28,113,0.85) 0%, rgba(215,109,119,0.85) 50%, rgba(255,175,123,0.85) 100%), 
+                        url('https://picsum.photos/id/1043/1920/1080');
+            background-size: cover;
+            background-blend-mode: overlay;
         }
 
-        /* 第三页背景图片 */
         .page-3 {
-            background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=80');
+            background: linear-gradient(135deg, rgba(31,64,55,0.85) 0%, rgba(153,242,200,0.85) 100%), 
+                        url('https://picsum.photos/id/1039/1920/1080');
+            background-size: cover;
+            background-blend-mode: overlay;
         }
 
         .hero-title {
@@ -100,18 +96,18 @@
             z-index: 2;
             text-align: center;
             color: #ffffff;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
 
         .hero-title h1 {
             font-size: 3rem;
             font-weight: 600;
-            margin-bottom: 15px;
-            text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            margin-bottom: 12px;
         }
 
         .hero-title p {
             font-size: 1.2rem;
-            opacity: 0.85;
+            opacity: 0.9;
             letter-spacing: 2px;
         }
 
@@ -121,49 +117,56 @@
             right: 0;
             top: 0;
             height: 100vh;
-            width: 280px;
+            width: 300px;
             z-index: 200;
-            background: rgba(255, 255, 255, 0.65);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: var(--blur-glass);
             -webkit-backdrop-filter: var(--blur-glass);
             border-left: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.15);
             
-            /* 默认向右隐藏，只留出一条触发区域 */
-            transform: translateX(220px);
+            /* 默认大部分收起在屏幕右侧 */
+            transform: translateX(240px);
             transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
             display: flex;
             flex-direction: column;
             padding: 40px 20px;
         }
 
-        /* 鼠标靠近侧边栏时自动展开 */
+        /* 鼠标移入侧边栏范围时平滑向左展开 */
         .sidebar:hover {
             transform: translateX(0);
         }
 
-        .sidebar-indicator {
+        /* 侧边栏未展开时的提示按件 */
+        .sidebar-handle {
             position: absolute;
-            left: 15px;
+            left: 12px;
             top: 50%;
             transform: translateY(-50%);
-            width: 6px;
-            height: 40px;
-            background: var(--accent-blue);
-            border-radius: 10px;
-            opacity: 0.7;
-            transition: opacity 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
         }
 
-        .sidebar:hover .sidebar-indicator {
-            opacity: 0; /* 展开后隐去提示条 */
+        .sidebar-indicator {
+            width: 4px;
+            height: 36px;
+            background: var(--accent-blue);
+            border-radius: 4px;
+        }
+
+        .sidebar:hover .sidebar-handle {
+            opacity: 0;
+            pointer-events: none;
         }
 
         .sidebar-title {
             font-size: 1.2rem;
             font-weight: 700;
-            color: var(--monet-text-main);
-            margin-bottom: 30px;
+            color: #1d1d1f;
+            margin-bottom: 25px;
             padding-left: 10px;
             border-left: 4px solid var(--accent-blue);
         }
@@ -174,45 +177,43 @@
             gap: 16px;
         }
 
-        /* ================= 独创“预测性点击”按钮样式 ================= */
+        /* ================= 独创“预测性点击”按钮 ================= */
         .predictive-btn {
             position: relative;
-            background: rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.08);
             border-radius: var(--miui-radius-sm);
             padding: 16px;
             cursor: pointer;
             transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
             overflow: hidden;
         }
 
         .predictive-btn .btn-title {
             font-size: 1rem;
             font-weight: 600;
-            color: var(--monet-text-main);
+            color: #1d1d1f;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
-        /* 简要功能提示（默认隐藏，点击按住时展开） */
         .predictive-btn .btn-preview {
             max-height: 0;
             opacity: 0;
             font-size: 0.85rem;
-            color: var(--monet-text-muted);
-            margin-top: 0;
+            color: #666666;
             transition: all 0.3s ease;
             line-height: 1.4;
         }
 
-        /* --- 鼠标按住 (Holding) 激活状态：放大成小窗口 --- */
+        /* --- 按住 (Holding) 触发放大窗口 --- */
         .predictive-btn.holding {
-            transform: scale(1.08);
+            transform: scale(1.06);
             background: #ffffff;
             border-color: var(--accent-blue);
-            box-shadow: 0 12px 30px rgba(0, 102, 255, 0.25);
+            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.25);
             z-index: 10;
         }
 
@@ -223,7 +224,7 @@
         .predictive-btn.holding .btn-preview {
             max-height: 80px;
             opacity: 1;
-            margin-top: 10px;
+            margin-top: 8px;
         }
     </style>
 </head>
@@ -234,5 +235,97 @@
     </header>
 
     <aside class="sidebar">
-        <div class="sidebar-indicator"></div>
-        <div class="sidebar-title">功能
+        <div class="sidebar-handle">
+            <div class="sidebar-indicator"></div>
+        </div>
+
+        <div class="sidebar-title">功能导航</div>
+        
+        <div class="menu-list">
+            <div class="predictive-btn" data-href="mbti.html">
+                <div class="btn-title">🧠 MBTI 测试 <span>→</span></div>
+                <div class="btn-preview">探索你的性格类型与内在潜能，提供多维度解析。</div>
+            </div>
+
+            <div class="predictive-btn" data-href="f1.html">
+                <div class="btn-title">🏎️ F1 赛历 <span>→</span></div>
+                <div class="btn-preview">实时查阅本赛季一级方程式赛车各分站时间与地点。</div>
+            </div>
+
+            <div class="predictive-btn" data-href="movies.html">
+                <div class="btn-title">🎬 观影记录 <span>→</span></div>
+                <div class="btn-preview">记录我看过的影视作品，包含评分与个人独家短评。</div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="scroll-container">
+        <section class="page page-1">
+            <div class="hero-title">
+                <h1>这是 Sturgeon 的网站主页</h1>
+                <p>向下滑动探索更多功能 | 鼠标移至右侧展开导航</p>
+            </div>
+        </section>
+
+        <section class="page page-2">
+            <div class="hero-title">
+                <h1>极简 · 灵动 · 沉浸</h1>
+                <p>莫奈调色与 HyperOS 质感的融合</p>
+            </div>
+        </section>
+
+        <section class="page page-3">
+            <div class="hero-title">
+                <h1>热爱生活与探索</h1>
+                <p>速度、性格与光影的汇聚地</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.querySelectorAll('.predictive-btn').forEach(btn => {
+            let isHolding = false;
+
+            btn.addEventListener('mousedown', () => {
+                isHolding = true;
+                btn.classList.add('holding');
+            });
+
+            btn.addEventListener('mouseup', () => {
+                if (isHolding) {
+                    isHolding = false;
+                    btn.classList.remove('holding');
+                    const targetUrl = btn.getAttribute('data-href');
+                    if (targetUrl) window.location.href = targetUrl;
+                }
+            });
+
+            btn.addEventListener('mouseleave', () => {
+                if (isHolding) {
+                    isHolding = false;
+                    btn.classList.remove('holding');
+                }
+            });
+
+            btn.addEventListener('touchstart', () => {
+                isHolding = true;
+                btn.classList.add('holding');
+            });
+
+            btn.addEventListener('touchend', () => {
+                if (isHolding) {
+                    isHolding = false;
+                    btn.classList.remove('holding');
+                    const targetUrl = btn.getAttribute('data-href');
+                    if (targetUrl) window.location.href = targetUrl;
+                }
+            });
+
+            btn.addEventListener('touchcancel', () => {
+                isHolding = false;
+                btn.classList.remove('holding');
+            });
+        });
+    </script>
+</body>
+</html>
