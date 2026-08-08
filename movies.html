@@ -6,16 +6,19 @@
   <title>Sturgeon's Movies - 观影记录</title>
   <style>
     :root {
-      --bg-overlay: rgba(15, 23, 42, 0.65);
-      --glass-bg: rgba(30, 41, 59, 0.55);
-      --glass-card-bg: rgba(255, 255, 255, 0.08);
-      --glass-border: rgba(255, 255, 255, 0.18);
+      --bg-overlay: rgba(10, 15, 30, 0.55);
+      --glass-gradient: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.03));
+      --glass-card-gradient: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02));
+      --glass-border: rgba(255, 255, 255, 0.22);
+      --glass-border-hover: rgba(255, 255, 255, 0.45);
+      --glass-glow: inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
       --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-      --text-main: #f8fafc;
+      
+      --text-main: #ffffff;
       --text-muted: #cbd5e1;
       --primary: #38bdf8;
-      --accent: #f59e0b;
-      --danger: #ef4444;
+      --accent: #fbbf24;
+      --danger: #f87171;
     }
 
     * {
@@ -26,29 +29,43 @@
     }
 
     body {
-      /* 设置指定背景图片，并添加自适应居中 fixed 效果与半透明遮罩 */
-      background: linear-gradient(var(--bg-overlay), var(--bg-overlay)), 
-                  url('https://truth.bahamut.com.tw/s01/202308/8b4c68abf876aad7ebe2e8c002fbad4b.JPG') no-repeat center center fixed;
-      background-size: cover;
       color: var(--text-main);
       min-height: 100vh;
       padding-bottom: 80px;
+      position: relative;
+      overflow-x: hidden;
     }
 
-    /* 顶部导航栏 - 液态玻璃效果 */
+    /* 独立背景层：略微模糊与放大的毛玻璃壁纸 */
+    body::before {
+      content: "";
+      position: fixed;
+      top: -20px;
+      left: -20px;
+      right: -20px;
+      bottom: -20px;
+      background: linear-gradient(var(--bg-overlay), var(--bg-overlay)), 
+                  url('https://truth.bahamut.com.tw/s01/202308/8b4c68abf876aad7ebe2e8c002fbad4b.JPG') no-repeat center center;
+      background-size: cover;
+      filter: blur(10px); /* 背景略微模糊 */
+      transform: scale(1.05); /* 防止边缘白边 */
+      z-index: -1;
+    }
+
+    /* 顶栏 - 液态玻璃 */
     header {
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(16px) saturate(180%);
-      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
       position: sticky;
       top: 0;
       z-index: 100;
       border-bottom: 1px solid var(--glass-border);
-      padding: 1rem 1.5rem;
+      box-shadow: var(--glass-shadow), var(--glass-glow);
+      padding: 0.9rem 1.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
     }
 
     .header-left {
@@ -60,8 +77,8 @@
     .logo {
       font-size: 1.25rem;
       font-weight: 700;
-      color: var(--primary);
-      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      color: #fff;
+      text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
     }
 
     .user-actions {
@@ -70,17 +87,18 @@
       gap: 12px;
     }
 
-    /* 通用玻璃按键 */
+    /* 通用液态玻璃按键 */
     .btn {
-      background: rgba(56, 189, 248, 0.8);
-      color: #0f172a;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.75), rgba(56, 189, 248, 0.45));
+      color: #ffffff;
       border: 1px solid rgba(255, 255, 255, 0.3);
-      padding: 8px 16px;
-      border-radius: 10px;
+      padding: 8px 18px;
+      border-radius: 12px;
       font-weight: 600;
       cursor: pointer;
-      backdrop-filter: blur(8px);
-      transition: all 0.25s ease;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), var(--glass-glow);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       text-decoration: none;
       display: inline-flex;
       align-items: center;
@@ -88,99 +106,103 @@
     }
 
     .btn:hover {
-      background: rgba(56, 189, 248, 1);
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.95), rgba(56, 189, 248, 0.65));
       transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+      box-shadow: 0 8px 25px rgba(56, 189, 248, 0.4), var(--glass-glow);
+      border-color: rgba(255, 255, 255, 0.6);
     }
 
     .btn-secondary {
-      background: rgba(255, 255, 255, 0.12);
+      background: var(--glass-gradient);
       color: var(--text-main);
       border: 1px solid var(--glass-border);
     }
     .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.25);
-      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.08));
+      border-color: var(--glass-border-hover);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), var(--glass-glow);
     }
 
     .btn-danger {
-      background: rgba(239, 68, 68, 0.7);
+      background: linear-gradient(135deg, rgba(248, 113, 113, 0.7), rgba(239, 68, 68, 0.4));
       color: white;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
     }
     .btn-danger:hover {
-      background: rgba(239, 68, 68, 0.95);
-      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+      background: linear-gradient(135deg, rgba(248, 113, 113, 0.95), rgba(239, 68, 68, 0.7));
+      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4), var(--glass-glow);
     }
 
     .container {
       max-width: 1000px;
-      margin: 25px auto;
+      margin: 30px auto;
       padding: 0 15px;
     }
 
-    /* 选项卡栏 */
+    /* 选项卡栏 - 液态玻璃槽 */
     .tabs {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       margin-bottom: 25px;
       padding: 6px;
-      background: rgba(0, 0, 0, 0.25);
-      backdrop-filter: blur(12px);
-      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(255, 255, 255, 0.03));
+      backdrop-filter: blur(20px) saturate(180%);
+      border-radius: 16px;
       border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow), var(--glass-glow);
       width: fit-content;
     }
 
     .tab {
-      padding: 8px 20px;
+      padding: 8px 22px;
       cursor: pointer;
-      border-radius: 10px;
+      border-radius: 12px;
       color: var(--text-muted);
       font-weight: 500;
-      transition: all 0.3s;
+      transition: all 0.3s ease;
     }
 
     .tab.active {
-      background: rgba(255, 255, 255, 0.18);
+      background: var(--glass-gradient);
       color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3), var(--glass-glow);
     }
 
     /* 电影网格 */
     .movie-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 22px;
+      gap: 24px;
     }
 
     /* 电影卡片 - 高质感液态玻璃 */
     .movie-card {
-      background: var(--glass-card-bg);
-      backdrop-filter: blur(16px) saturate(180%);
-      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      background: var(--glass-card-gradient);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
       border: 1px solid var(--glass-border);
-      box-shadow: var(--glass-shadow);
-      border-radius: 18px;
-      padding: 20px;
+      box-shadow: var(--glass-shadow), var(--glass-glow);
+      border-radius: 20px;
+      padding: 22px;
       display: flex;
       flex-direction: column;
       gap: 12px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .movie-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
-      border-color: rgba(255, 255, 255, 0.35);
+      transform: translateY(-6px);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.05));
+      border-color: var(--glass-border-hover);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45), var(--glass-glow);
     }
 
     .movie-title {
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       font-weight: 700;
       color: #ffffff;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.4);
     }
 
     .movie-meta {
@@ -193,15 +215,17 @@
       font-weight: bold;
     }
 
+    /* 推荐评价框 - 玻璃凹槽 */
     .external-box {
-      background: rgba(56, 189, 248, 0.1);
-      border: 1px solid rgba(56, 189, 248, 0.2);
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(56, 189, 248, 0.03));
+      border: 1px solid rgba(56, 189, 248, 0.25);
       border-left: 4px solid var(--primary);
-      padding: 10px;
+      padding: 12px;
       font-size: 0.85rem;
       color: #e2e8f0;
-      border-radius: 8px;
-      backdrop-filter: blur(6px);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
     }
 
     .card-actions {
@@ -209,29 +233,30 @@
       display: flex;
       justify-content: flex-end;
       gap: 10px;
-      padding-top: 10px;
+      padding-top: 8px;
     }
 
-    /* Modal 弹窗 - 玻璃框 */
+    /* Modal 弹窗 - 深度液态玻璃 */
     .modal {
       display: none;
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.65);
-      backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       z-index: 200;
       justify-content: center;
       align-items: center;
     }
 
     .modal-content {
-      background: rgba(30, 41, 59, 0.75);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-      padding: 28px;
-      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04));
+      backdrop-filter: blur(25px) saturate(190%);
+      -webkit-backdrop-filter: blur(25px) saturate(190%);
+      border: 1px solid var(--glass-border-hover);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), var(--glass-glow);
+      padding: 30px;
+      border-radius: 24px;
       width: 90%;
       max-width: 420px;
       display: flex;
@@ -241,43 +266,46 @@
 
     .modal-content input, .modal-content textarea, .modal-content select {
       width: 100%;
-      padding: 12px;
-      background: rgba(0, 0, 0, 0.3);
+      padding: 12px 16px;
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.35), rgba(255, 255, 255, 0.05));
       border: 1px solid var(--glass-border);
       color: white;
-      border-radius: 10px;
+      border-radius: 12px;
       outline: none;
-      transition: border-color 0.2s;
+      backdrop-filter: blur(10px);
+      transition: all 0.25s ease;
     }
 
     .modal-content input:focus, .modal-content textarea:focus, .modal-content select:focus {
       border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
     }
 
-    /* 悬浮 + 号添加按钮 */
+    /* 悬浮 + 号添加按钮 - 流体悬浮球 */
     .fab {
       position: fixed;
-      bottom: 30px;
-      right: 30px;
-      width: 60px;
-      height: 60px;
-      border-radius: 30px;
-      background: rgba(56, 189, 248, 0.85);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      color: #0f172a;
+      bottom: 35px;
+      right: 35px;
+      width: 62px;
+      height: 62px;
+      border-radius: 31px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.9), rgba(56, 189, 248, 0.5));
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      color: #ffffff;
       font-size: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 8px 25px rgba(56, 189, 248, 0.4);
-      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(56, 189, 248, 0.4), var(--glass-glow);
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .fab:hover {
-      transform: scale(1.1) rotate(90deg);
-      background: rgba(56, 189, 248, 1);
+      transform: scale(1.12) rotate(90deg);
+      background: linear-gradient(135deg, rgba(56, 189, 248, 1), rgba(56, 189, 248, 0.7));
+      box-shadow: 0 15px 35px rgba(56, 189, 248, 0.6), var(--glass-glow);
     }
   </style>
 </head>
@@ -334,7 +362,7 @@
   </div>
 
   <script>
-    // ⚠️ 请将这里的 URL 替换为你真实的 Cloudflare Worker 域名！
+    // ⚠️ 请确认这里的 URL 为你真实的 Cloudflare Worker 域名！
     const API_BASE = 'https://sturgeon-movies-api.zhx100560.workers.dev/api';
 
     let isRegisterMode = false;
@@ -409,7 +437,7 @@
       });
 
       if (filtered.length === 0) {
-        grid.innerHTML = `<div style="color: var(--text-muted); grid-column: 1/-1; text-align: center; padding: 50px; background: rgba(0,0,0,0.2); border-radius: 16px; backdrop-filter: blur(10px);">暂无记录，点击右下角 + 按钮添加吧！</div>`;
+        grid.innerHTML = `<div style="color: var(--text-muted); grid-column: 1/-1; text-align: center; padding: 50px; background: var(--glass-card-gradient); border-radius: 20px; backdrop-filter: blur(20px); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow), var(--glass-glow);">暂无记录，点击右下角 + 按钮添加吧！</div>`;
         return;
       }
 
